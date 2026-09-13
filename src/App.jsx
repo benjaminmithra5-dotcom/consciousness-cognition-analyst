@@ -822,20 +822,34 @@ function HomeScreen({ onNavigate, onOpenExercise }) {
   const [wtmEmail, setWtmEmail] = useState("");
   const [wtmMessage, setWtmMessage] = useState("");
   const [wtmError, setWtmError] = useState("");
+  const [wtmStatus, setWtmStatus] = useState("idle"); // idle | sending | sent | failed
 
   const scrollToWriteToMe = () => {
     writeToMeRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  const handleWtmSubmit = () => {
+  const handleWtmSubmit = async () => {
     if (!wtmName.trim() || !wtmEmail.trim() || !wtmMessage.trim()) {
       setWtmError("Please fill in your name, email id, and message before submitting.");
       return;
     }
     setWtmError("");
-    const subject = encodeURIComponent(`Message from ${wtmName.trim()}`);
-    const body = encodeURIComponent(`${wtmMessage.trim()}\n\nFrom: ${wtmName.trim()} (${wtmEmail.trim()})`);
-    window.location.href = `mailto:${HOME_WRITE_TO_ME_EMAIL}?subject=${subject}&body=${body}`;
+    setWtmStatus("sending");
+    try {
+      const res = await fetch(FORMSPREE_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ name: wtmName.trim(), email: wtmEmail.trim(), message: wtmMessage.trim() }),
+      });
+      if (res.ok) {
+        setWtmStatus("sent");
+        setWtmName(""); setWtmEmail(""); setWtmMessage("");
+      } else {
+        setWtmStatus("failed");
+      }
+    } catch (e) {
+      setWtmStatus("failed");
+    }
   };
 
   useEffect(() => {
@@ -911,8 +925,12 @@ function HomeScreen({ onNavigate, onOpenExercise }) {
           </div>
 
           {wtmError && <p style={styles(c).writeToMeError}>{wtmError}</p>}
+          {wtmStatus === "sent" && <p style={styles(c).writeToMeSuccess}>Message sent. Thank you, I'll get back to you soon.</p>}
+          {wtmStatus === "failed" && <p style={styles(c).writeToMeError}>Something went wrong sending that. Please try again in a moment.</p>}
 
-          <button type="button" style={styles(c).btnPrimary} onClick={handleWtmSubmit}>Submit</button>
+          <button type="button" style={styles(c).btnPrimary} onClick={handleWtmSubmit} disabled={wtmStatus === "sending"}>
+            {wtmStatus === "sending" ? "Sending…" : "Submit"}
+          </button>
         </div>
 
         <div style={styles(c).consultTeaserWrap}>
@@ -3134,7 +3152,7 @@ function RVLabScreen() {
 // =================================================================
 const WHATSAPP_NUMBER = "447440573315";
 const EMAIL_ADDRESS = "benjaminmithra@gmail.com";
-const HOME_WRITE_TO_ME_EMAIL = "benjaminmithra5@gmail.com";
+const FORMSPREE_ENDPOINT = "https://formspree.io/f/xjyvqwrd";
 const CONTACT_AREAS = ["Parapsychology and anomalous experiences","Hypnosis and Hypnotic Techniques","Habit Change and Behavioral Responses","Beliefs and Cognitive Patterns","Mindfulness and Awareness","Memory and Cognitive Performance","Paradox De-conditioning"];
 
 function WhatsAppIcon() {
@@ -3383,6 +3401,7 @@ export default function App() {
                 "There are no accounts, logins, or user profiles anywhere on this site.",
                 "Remote Viewing sketches, notes, and scores exist only in your browser while you're using them, and are never saved or sent anywhere.",
                 "Nothing typed into the Exercises tab (Flow Type, Guilford's Test answers) is stored either.",
+                "The Write to Me form on the Home page is the one exception: the name, email, and message you submit there are sent to Formspree, a third-party form delivery service, which forwards it directly to the site owner's inbox. That message is not otherwise stored, published, or used for anything else.",
                 "No cookies, no localStorage, and no tracking of any kind are used on this site.",
                 "Loading the site's fonts (Google Fonts) and Remote Viewing target photos (Lorem Picsum) means your browser contacts those services directly, the same as most websites that use web fonts or hosted images.",
                 "No analytics services or advertising networks are used here.",
@@ -3777,6 +3796,7 @@ function styles(c) {
       borderRadius: 8, padding: "10px 12px", outline: "none", width: "100%", minHeight: 120, resize: "vertical", boxSizing: "border-box",
     },
     writeToMeError: { fontFamily: font.display, fontWeight: 500, fontSize: 13.5, color: c.bad, margin: 0 },
+    writeToMeSuccess: { fontFamily: font.display, fontWeight: 500, fontSize: 13.5, color: c.good, margin: 0 },
     contactAreaGrid: { display: "flex", flexWrap: "wrap", gap: 8 },
     contactAreaChip: {
       fontFamily: font.body, fontSize: 13, lineHeight: 1.4, color: c.ink, background: "rgba(255,255,255,0.04)",
