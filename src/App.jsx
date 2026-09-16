@@ -677,11 +677,11 @@ const BIO_BUBBLES = [
   "Since 8 years",
   "Memory",
   "Mindfulness",
-  "Philosophy",
   "Hypnosis",
   "Cognition",
   "Parapsychology",
   "Anomalous experiences",
+  "Paranormal Investigations",
 ];
 const LEET_MESSAGE = "Th3 m1nd 1s n0t 4 f1x3d th1ng, 1t 3v0lv3s w1th 3v3ry qu3st10n w3 4sk. 4w4r3n3ss sh4p3s 0ur p3rc3pt10n, wh1l3 m3m0ry, 4tt3nt10n, 1ntu1t10n 4nd r34s0n1ng sh4p3 h0w w3 1nt3rpr3t th3 w0rld. P4r4psych0l0gy 1nv1t3s us t0 3xpl0r3 wh4t l13s b3y0nd 0rd1n4ry 0bs3rv4t10n, wh1l3 c0gn1t10n h3lps us qu3st10n wh4t w3 th1nk w3 kn0w. Th3r3 1s 4lw4ys m0r3 t0 3xpl0r3, 4nd th3 m1nd 1s th3 pl4c3 t0 st4rt.";
 
@@ -3153,7 +3153,7 @@ function RVLabScreen() {
 const WHATSAPP_NUMBER = "447440573315";
 const EMAIL_ADDRESS = "benjaminmithra@gmail.com";
 const FORMSPREE_ENDPOINT = "https://formspree.io/f/xjyvqwrd";
-const CONTACT_AREAS = ["Parapsychology and anomalous experiences","Hypnosis and Hypnotic Techniques","Habit Change and Behavioral Responses","Beliefs and Cognitive Patterns","Mindfulness and Awareness","Memory and Cognitive Performance","Paradox De-conditioning"];
+const CONTACT_AREAS = ["Parapsychology and anomalous experiences","Hypnosis","Habit Change and Behavioral Responses","Beliefs and Cognitive Patterns","Mindfulness and Awareness","Memory and Cognitive Performance","Paradox Deconditioning","Paranormal Investigation"];
 
 function WhatsAppIcon() {
   return (
@@ -3186,10 +3186,10 @@ function ContactScreen({ onNavigate }) {
 
         <div style={styles(c).contactDivider} />
 
-        <p style={styles(c).contactBody}>My approach draws from cognition, consciousness, behavioral work, hypnosis, mindfulness and the practices I use myself. You don't need to decide which method you need beforehand. We start with the problem, explore what is happening, and work from there.</p>
+        <p style={styles(c).contactBody}>My interest in this field began long before it became my work, and it has only grown deeper with time. Wherever you are is a good place to begin, and we'll move forward together.</p>
 
         <div style={styles(c).contactPriceRow}>
-          <span style={styles(c).contactPriceBadge}>$110<span style={styles(c).contactPriceUnit}> / session</span></span>
+          <span style={styles(c).contactPriceBadge}>$110<span style={styles(c).contactPriceUnit}> USD / session</span></span>
         </div>
 
         <div style={styles(c).contactDivider} />
