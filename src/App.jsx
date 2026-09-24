@@ -3262,7 +3262,6 @@ export default function App() {
   const [celebrate, setCelebrate] = useState(null);
 
   useEffect(() => {
-    document.title = "Memory Chain";
     const link = document.createElement("link");
     link.rel = "stylesheet";
     link.href = "https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=Space+Mono:wght@400;700&display=swap";
