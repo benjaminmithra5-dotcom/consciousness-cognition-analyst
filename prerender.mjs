@@ -5,7 +5,8 @@
 // real index.html for that route. This is what lets a crawler that
 // never executes JavaScript (including most AI search tools) see the
 // complete page content, not an empty shell.
-import puppeteer from "puppeteer";
+import puppeteer from "puppeteer-core";
+import chromium from "@sparticuz/chromium";
 import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
@@ -23,9 +24,6 @@ const MIME = {
   ".woff": "font/woff", ".woff2": "font/woff2",
 };
 
-// A tiny static file server with SPA fallback: any request for a path
-// that isn't a real file on disk gets the built index.html instead,
-// so client side routing can take over, exactly like a real host does.
 function startServer() {
   return new Promise((resolve) => {
     const server = http.createServer((req, res) => {
@@ -57,7 +55,12 @@ async function main() {
   const server = await startServer();
 
   console.log("Launching headless browser...");
-  const browser = await puppeteer.launch({ headless: true, args: ["--no-sandbox", "--disable-setuid-sandbox"] });
+  const browser = await puppeteer.launch({
+    args: chromium.args,
+    defaultViewport: chromium.defaultViewport,
+    executablePath: await chromium.executablePath(),
+    headless: chromium.headless,
+  });
 
   for (const { path: routePath } of ROUTES) {
     const page = await browser.newPage();
@@ -67,9 +70,6 @@ async function main() {
     try {
       await page.goto(url, { waitUntil: "networkidle0", timeout: 30000 });
 
-      // Wait until the app has actually rendered content and set a
-      // real title, rather than capturing the page before React has
-      // finished its first render.
       await page.waitForFunction(
         () => document.getElementById("root")?.children.length > 0 && document.title.length > 0,
         { timeout: 15000 }
