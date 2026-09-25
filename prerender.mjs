@@ -5,8 +5,7 @@
 // real index.html for that route. This is what lets a crawler that
 // never executes JavaScript (including most AI search tools) see the
 // complete page content, not an empty shell.
-import puppeteer from "puppeteer-core";
-import chromium from "@sparticuz/chromium";
+import puppeteer from "puppeteer";
 import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
@@ -55,12 +54,7 @@ async function main() {
   const server = await startServer();
 
   console.log("Launching headless browser...");
-  const browser = await puppeteer.launch({
-    args: chromium.args,
-    defaultViewport: chromium.defaultViewport,
-    executablePath: await chromium.executablePath(),
-    headless: chromium.headless,
-  });
+  const browser = await puppeteer.launch({ headless: true, args: ["--no-sandbox", "--disable-setuid-sandbox"] });
 
   for (const { path: routePath } of ROUTES) {
     const page = await browser.newPage();
