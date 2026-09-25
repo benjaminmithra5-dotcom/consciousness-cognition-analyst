@@ -1,22 +1,9 @@
-{
-  "name": "consciousness-cognition-analyst",
-  "private": true,
-  "version": "1.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build && node generate-sitemap.mjs && node prerender.mjs",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^6.26.2",
-    "tone": "^15.0.4"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-react": "^4.3.1",
-    "puppeteer": "^23.4.0",
-    "vite": "^5.4.1"
-  }
-}
+import ReactDOM from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import App from "./App.jsx";
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>
+);
