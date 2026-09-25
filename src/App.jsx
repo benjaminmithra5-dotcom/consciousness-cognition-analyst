@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo, createContext, useContext } from "react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import * as Tone from "tone";
 
 // =================================================================
@@ -900,10 +901,10 @@ function HomeScreen({ onNavigate, onOpenExercise }) {
         </button>
 
         <div style={styles(c).heroButtonsGrid}>
-          <button className="nav-btn hero-btn" style={styles(c).heroBtn} onClick={() => onNavigate("journals")}>Read</button>
-          <button className="nav-btn hero-btn" style={styles(c).heroBtn} onClick={() => onNavigate("exercises")}>Exercise</button>
-          <button className="nav-btn hero-btn" style={styles(c).heroBtn} onClick={() => onNavigate("games")}>Play</button>
-          <button className="nav-btn hero-btn" style={styles(c).heroBtn} onClick={() => onNavigate("rvlab")}>View</button>
+          <Link to={VIEW_PATH.journals} className="nav-btn hero-btn" style={styles(c).heroBtn}>Read</Link>
+          <Link to={VIEW_PATH.exercises} className="nav-btn hero-btn" style={styles(c).heroBtn}>Exercise</Link>
+          <Link to={VIEW_PATH.games} className="nav-btn hero-btn" style={styles(c).heroBtn}>Play</Link>
+          <Link to={VIEW_PATH.rvlab} className="nav-btn hero-btn" style={styles(c).heroBtn}>View</Link>
         </div>
 
         <div ref={writeToMeRef} style={styles(c).writeToMeWrap}>
@@ -935,7 +936,7 @@ function HomeScreen({ onNavigate, onOpenExercise }) {
 
         <div style={styles(c).consultTeaserWrap}>
           <p style={styles(c).consultTeaserText}>Need Support?</p>
-          <button type="button" style={styles(c).btnGold} onClick={() => onNavigate("contact")}>View My Consultation</button>
+          <Link to={VIEW_PATH.contact} style={styles(c).btnGold}>View My Consultation</Link>
         </div>
 
         <div style={styles(c).emotionMarqueeWrap}>
@@ -955,11 +956,11 @@ function HomeScreen({ onNavigate, onOpenExercise }) {
         <p style={styles(c).homeFooterLine}>
           <span>© {new Date().getFullYear()} Benjamin Mithra</span>
           <span style={styles(c).homeFooterDot}>·</span>
-          <button type="button" className="home-footer-link" style={styles(c).homeFooterLink} onClick={() => onNavigate("privacy")}>Privacy</button>
+          <Link to={VIEW_PATH.privacy} className="home-footer-link" style={styles(c).homeFooterLink}>Privacy</Link>
           <span style={styles(c).homeFooterDot}>·</span>
-          <button type="button" className="home-footer-link" style={styles(c).homeFooterLink} onClick={() => onNavigate("terms")}>Terms</button>
+          <Link to={VIEW_PATH.terms} className="home-footer-link" style={styles(c).homeFooterLink}>Terms</Link>
           <span style={styles(c).homeFooterDot}>·</span>
-          <button type="button" className="home-footer-link" style={styles(c).homeFooterLink} onClick={() => onNavigate("disclaimer")}>Disclaimer</button>
+          <Link to={VIEW_PATH.disclaimer} className="home-footer-link" style={styles(c).homeFooterLink}>Disclaimer</Link>
         </p>
       </div>
     </div>
@@ -2184,9 +2185,9 @@ function GamesMenu({ onSelect }) {
       <p style={styles(c).instruction}>Choose a game to play or practice.</p>
       <div style={styles(c).gamesMenuGrid}>
         {GAME_TABS.map((t) => (
-          <button key={t.key} className="nav-btn" style={styles(c).gamesMenuCard} onClick={() => onSelect(t.key)}>
+          <Link key={t.key} to={`/games/${GAME_SLUG[t.key]}`} className="nav-btn" style={styles(c).gamesMenuCard}>
             {t.label}
-          </button>
+          </Link>
         ))}
       </div>
     </div>
@@ -2227,10 +2228,10 @@ function ExercisesMenu({ onSelect }) {
       <p style={styles(c).instruction}>Choose an exercise to practice.</p>
       <div style={styles(c).exercisesMenuGrid}>
         {EXERCISE_TABS.map((t) => (
-          <button key={t.key} className="nav-btn" style={styles(c).exerciseMenuCard} onClick={() => onSelect(t.key)}>
+          <Link key={t.key} to={`/exercises/${EXERCISE_SLUG[t.key]}`} className="nav-btn" style={styles(c).exerciseMenuCard}>
             <span className="exercise-card-title" style={styles(c).exerciseMenuCardTitle}>{t.label}</span>
             <span className="exercise-card-desc" style={styles(c).exerciseMenuCardDesc}>{t.description}</span>
-          </button>
+          </Link>
         ))}
       </div>
     </div>
@@ -2811,11 +2812,11 @@ function PlaceholderScreen({ title, note, points, onNavigate }) {
         <p style={styles(c).homeFooterLine}>
           <span>© {new Date().getFullYear()} Benjamin Mithra</span>
           <span style={styles(c).homeFooterDot}>·</span>
-          <button type="button" className="home-footer-link" style={styles(c).homeFooterLink} onClick={() => onNavigate("privacy")}>Privacy</button>
+          <Link to={VIEW_PATH.privacy} className="home-footer-link" style={styles(c).homeFooterLink}>Privacy</Link>
           <span style={styles(c).homeFooterDot}>·</span>
-          <button type="button" className="home-footer-link" style={styles(c).homeFooterLink} onClick={() => onNavigate("terms")}>Terms</button>
+          <Link to={VIEW_PATH.terms} className="home-footer-link" style={styles(c).homeFooterLink}>Terms</Link>
           <span style={styles(c).homeFooterDot}>·</span>
-          <button type="button" className="home-footer-link" style={styles(c).homeFooterLink} onClick={() => onNavigate("disclaimer")}>Disclaimer</button>
+          <Link to={VIEW_PATH.disclaimer} className="home-footer-link" style={styles(c).homeFooterLink}>Disclaimer</Link>
         </p>
       )}
     </div>
@@ -3208,11 +3209,11 @@ function ContactScreen({ onNavigate }) {
       <p style={styles(c).homeFooterLine}>
         <span>© {new Date().getFullYear()} Benjamin Mithra</span>
         <span style={styles(c).homeFooterDot}>·</span>
-        <button type="button" className="home-footer-link" style={styles(c).homeFooterLink} onClick={() => onNavigate("privacy")}>Privacy</button>
+        <Link to={VIEW_PATH.privacy} className="home-footer-link" style={styles(c).homeFooterLink}>Privacy</Link>
         <span style={styles(c).homeFooterDot}>·</span>
-        <button type="button" className="home-footer-link" style={styles(c).homeFooterLink} onClick={() => onNavigate("terms")}>Terms</button>
+        <Link to={VIEW_PATH.terms} className="home-footer-link" style={styles(c).homeFooterLink}>Terms</Link>
         <span style={styles(c).homeFooterDot}>·</span>
-        <button type="button" className="home-footer-link" style={styles(c).homeFooterLink} onClick={() => onNavigate("disclaimer")}>Disclaimer</button>
+        <Link to={VIEW_PATH.disclaimer} className="home-footer-link" style={styles(c).homeFooterLink}>Disclaimer</Link>
       </p>
     </div>
   );
@@ -3246,10 +3247,90 @@ const GAME_TABS = [
   { key: "numbers", label: "Number Memory" },
 ];
 
+// =================================================================
+// Routing. Real, bookmarkable URLs for every top-level section and
+// every individual game/exercise, so each one is a genuine page a
+// search engine (or a person) can land on directly, rather than
+// everything living behind one URL with internal state. VIEW_PATH
+// maps the app's existing internal "view" keys (unchanged from
+// before) to real paths; GAME_SLUG/EXERCISE_SLUG do the same one
+// level down for the individual games and exercises.
+// =================================================================
+const VIEW_PATH = {
+  home: "/", journals: "/journals", exercises: "/exercises", games: "/games",
+  rvlab: "/rv-lab", contact: "/consultation", privacy: "/privacy", terms: "/terms", disclaimer: "/disclaimer",
+};
+const GAME_SLUG = { chess: "chess", everyday: "recall", nback: "n-back", cards: "card-memory", words: "word-memory", numbers: "number-memory" };
+const GAME_KEY_FROM_SLUG = Object.fromEntries(Object.entries(GAME_SLUG).map(([k, v]) => [v, k]));
+const EXERCISE_SLUG = { breathing: "breathing", leet: "leetspeak-reading", flowtype: "flow-type", guilford: "guilfords-test" };
+const EXERCISE_KEY_FROM_SLUG = Object.fromEntries(Object.entries(EXERCISE_SLUG).map(([k, v]) => [v, k]));
+
+// Per page <title> and meta description, applied on every route
+// change (including on the very first load, which is what the
+// prerender step below captures into the static HTML for that URL).
+const PAGE_META = {
+  home: { title: "Consciousness and Cognition Analyst | Benjamin Mithra", description: "Cognitive performance consultation, mindfulness exercises, memory games, and remote viewing practice with Benjamin Mithra, a Consciousness and Cognition Analyst." },
+  journals: { title: "Journals | Consciousness and Cognition Analyst", description: "Reflections and reading on consciousness, cognition, and mindfulness from Benjamin Mithra. New journal entries coming soon." },
+  exercises: { title: "Mindfulness and Cognitive Exercises | Consciousness and Cognition Analyst", description: "Guided mindfulness breathing, leetspeak reading, flow typing, and Guilford's divergent thinking test to train focus, calm, and cognitive fluency." },
+  "exercise-breathing": { title: "Mindfulness Breathing Exercise | Consciousness and Cognition Analyst", description: "A guided breathing exercise: inhale, hold, exhale, and hold again, paced to help you slow down and breathe more deliberately." },
+  "exercise-leet": { title: "Leetspeak Reading Exercise | Consciousness and Cognition Analyst", description: "Decode short stories written in leetspeak to train visual attention, pattern recognition, and reading fluency." },
+  "exercise-flowtype": { title: "Flow Type Exercise | Consciousness and Cognition Analyst", description: "Type continuously without stopping to build sustained focus and mental stamina under light pressure." },
+  "exercise-guilford": { title: "Guilford's Test | Consciousness and Cognition Analyst", description: "A classic divergent thinking task: name unusual uses for an everyday object to exercise creative fluency." },
+  games: { title: "Memory and Cognitive Games | Consciousness and Cognition Analyst", description: "Chess, Recall, N Back, Card Memory, Word Memory, and Number Memory: games built to train focus, memory, and pattern recognition." },
+  "game-chess": { title: "Chess | Consciousness and Cognition Analyst", description: "Play chess against a built in engine, with a running timer and alternating colors each game." },
+  "game-everyday": { title: "Recall: Everyday Memory Games | Consciousness and Cognition Analyst", description: "A rotating set of quick memory games: Digit Span, Word Recall, Kim's Game, Pattern Recall, Flash Grid, and Detective Case." },
+  "game-nback": { title: "N Back Memory Game | Consciousness and Cognition Analyst", description: "A classic working memory task: spot the repeated pattern one step back in a moving sequence." },
+  "game-cards": { title: "Card Memory Game | Consciousness and Cognition Analyst", description: "Memorize the positions of cards, then match pairs from memory." },
+  "game-words": { title: "Word Memory Game | Consciousness and Cognition Analyst", description: "Memorize a list of words, then recall as many as you can." },
+  "game-numbers": { title: "Number Memory Game | Consciousness and Cognition Analyst", description: "Memorize a growing sequence of digits and recall it back correctly." },
+  rvlab: { title: "Remote Viewing Lab | Consciousness and Cognition Analyst", description: "Practice remote viewing with a freehand sketch, session notes, and a hidden target reveal, exploring anomalous perception and parapsychology." },
+  contact: { title: "Private Consultation | Benjamin Mithra, Consciousness and Cognition Analyst", description: "Book a private one to one consultation with Benjamin Mithra covering habit change, hypnosis, mindfulness, cognitive performance, and parapsychology, $110 USD per session." },
+  privacy: { title: "Privacy Policy | Consciousness and Cognition Analyst", description: "How this site handles data: no accounts, no tracking, and what actually happens with the Write to Me form." },
+  terms: { title: "Terms | Consciousness and Cognition Analyst", description: "Terms for using this site's games, exercises, and remote viewing content." },
+  disclaimer: { title: "Disclaimer | Consciousness and Cognition Analyst", description: "This site is educational and experimental, and is not a substitute for medical, psychiatric, or licensed psychological care." },
+};
+
+function useDocumentMeta(key) {
+  useEffect(() => {
+    const meta = PAGE_META[key] || PAGE_META.home;
+    document.title = meta.title;
+    let tag = document.querySelector('meta[name="description"]');
+    if (!tag) {
+      tag = document.createElement("meta");
+      tag.setAttribute("name", "description");
+      document.head.appendChild(tag);
+    }
+    tag.setAttribute("content", meta.description);
+  }, [key]);
+}
+
 export default function App() {
-  const [view, setView] = useState("home");
-  const [gameTab, setGameTab] = useState(null);
-  const [exerciseTab, setExerciseTab] = useState(null);
+  const routerNavigate = useNavigate();
+  const location = useLocation();
+  const pathParts = location.pathname.split("/").filter(Boolean);
+
+  const view = useMemo(() => {
+    if (pathParts.length === 0) return "home";
+    const first = pathParts[0];
+    if (first === "consultation") return "contact";
+    if (first === "rv-lab") return "rvlab";
+    if (["journals", "exercises", "games", "privacy", "terms", "disclaimer"].includes(first)) return first;
+    return "home";
+  }, [location.pathname]);
+
+  const gameTab = useMemo(() => {
+    if (pathParts[0] !== "games" || !pathParts[1]) return null;
+    return GAME_KEY_FROM_SLUG[pathParts[1]] || null;
+  }, [location.pathname]);
+
+  const exerciseTab = useMemo(() => {
+    if (pathParts[0] !== "exercises" || !pathParts[1]) return null;
+    return EXERCISE_KEY_FROM_SLUG[pathParts[1]] || null;
+  }, [location.pathname]);
+
+  const metaKey = view === "games" && gameTab ? `game-${gameTab}` : view === "exercises" && exerciseTab ? `exercise-${exerciseTab}` : view;
+  useDocumentMeta(metaKey);
+
   const [menuOpen, setMenuOpen] = useState(false);
 
   const [activeGame, setActiveGame] = useState(() => pickRandomGame(new Set()));
@@ -3298,11 +3379,13 @@ export default function App() {
     setActiveGame(pickRandomGame(new Set())); setRunKey((k) => k + 1); setPhase("playing");
   };
 
-  const navigate = (target) => { setView(target); if (target === "games") setGameTab(null); if (target === "exercises") setExerciseTab(null); setMenuOpen(false); };
-  const goToExercise = (key) => { setView("exercises"); setExerciseTab(key); setMenuOpen(false); };
+  const navigate = (target) => { routerNavigate(VIEW_PATH[target] || "/"); setMenuOpen(false); };
+  const goToExercise = (key) => { routerNavigate(`/exercises/${EXERCISE_SLUG[key] || ""}`); setMenuOpen(false); };
+  const selectGame = (key) => { routerNavigate(`/games/${GAME_SLUG[key] || ""}`); };
+  const selectExercise = (key) => { routerNavigate(`/exercises/${EXERCISE_SLUG[key] || ""}`); };
   const handleBackArrow = () => {
-    if (view === "games" && gameTab !== null) setGameTab(null);
-    else if (view === "exercises" && exerciseTab !== null) setExerciseTab(null);
+    if (view === "games" && gameTab !== null) routerNavigate("/games");
+    else if (view === "exercises" && exerciseTab !== null) routerNavigate("/exercises");
     else navigate("home");
   };
 
@@ -3350,9 +3433,9 @@ export default function App() {
           <div style={styles(c).topBar}>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center", width: "100%" }}>
               {TOP_TABS.map((t) => (
-                <button key={t.key} className="nav-btn" style={{ ...styles(c).cornerBtn, ...(view === t.key ? styles(c).cornerBtnActive : {}) }} onClick={() => navigate(t.key)}>
+                <Link key={t.key} to={VIEW_PATH[t.key] || "/"} className="nav-btn" style={{ ...styles(c).cornerBtn, ...(view === t.key ? styles(c).cornerBtnActive : {}) }}>
                   {t.label}
-                </button>
+                </Link>
               ))}
             </div>
           </div>
@@ -3366,9 +3449,9 @@ export default function App() {
                   <div style={styles(c).hamburgerBackdrop} onClick={() => setMenuOpen(false)} />
                   <div style={styles(c).hamburgerMenu}>
                     {HAMBURGER_MENU_ITEMS.map((t) => (
-                      <button key={t.key} className="nav-btn" style={{ ...styles(c).hamburgerMenuItem, ...(view === t.key ? styles(c).cornerBtnActive : {}) }} onClick={() => navigate(t.key)}>
+                      <Link key={t.key} to={VIEW_PATH[t.key] || "/"} onClick={() => setMenuOpen(false)} className="nav-btn" style={{ ...styles(c).hamburgerMenuItem, ...(view === t.key ? styles(c).cornerBtnActive : {}) }}>
                         {t.label}
-                      </button>
+                      </Link>
                     ))}
                   </div>
                 </>
@@ -3385,7 +3468,7 @@ export default function App() {
           {view === "home" && <HomeScreen onNavigate={navigate} onOpenExercise={goToExercise} />}
 
           {view === "journals" && <PlaceholderScreen title="Journals" note="Reserved for reflections and reading. Coming soon." onNavigate={navigate} />}
-          {view === "exercises" && exerciseTab === null && <ExercisesMenu onSelect={setExerciseTab} />}
+          {view === "exercises" && exerciseTab === null && <ExercisesMenu onSelect={selectExercise} />}
           {view === "exercises" && exerciseTab === "breathing" && <MindfulnessBreathingExercise />}
           {view === "exercises" && exerciseTab === "leet" && <LeetReadingExercise />}
           {view === "exercises" && exerciseTab === "flowtype" && <FlowTypeExercise />}
@@ -3436,7 +3519,7 @@ export default function App() {
             />
           )}
 
-          {view === "games" && gameTab === null && <GamesMenu onSelect={setGameTab} />}
+          {view === "games" && gameTab === null && <GamesMenu onSelect={selectGame} />}
           {view === "games" && gameTab === "cards" && <CardMemory />}
           {view === "games" && gameTab === "nback" && <NBackGame />}
           {view === "games" && gameTab === "words" && <WordMemory />}
