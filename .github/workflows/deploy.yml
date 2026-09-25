@@ -1,18 +1,15 @@
-name: Build and Deploy to Vercel
+name: Build and Commit Output
 
-# Runs automatically every time you push to the main branch. This exists
-# because Vercel's own build environment cannot run a real headless
-# browser (needed for prerendering every page into static HTML), but a
-# GitHub Actions runner is a full virtual machine that can. So the actual
-# building happens here, and the finished, already-built result is then
-# uploaded to Vercel as-is.
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repository
@@ -23,14 +20,20 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install Vercel CLI
-        run: npm install --global vercel@latest
+      - name: Install dependencies
+        run: npm install
 
-      - name: Pull Vercel project settings
-        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Build the project (vite build, sitemap, then prerendering)
+        run: npm run build
 
-      - name: Build the project (this runs npm run build, including prerendering)
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Copy the finished build into deploy-output
+        run: |
+          rm -rf deploy-output
+          mkdir -p deploy-output
+          cp -r dist/. deploy-output/
 
-      - name: Deploy the already-built result to Vercel
-        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Commit and push the finished build
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Update deploy-output [skip ci]"
+          file_pattern: deploy-output/**
