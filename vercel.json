@@ -1,7 +1,4 @@
 {
   "cleanUrls": true,
-  "trailingSlash": false,
-  "git": {
-    "deploymentEnabled": false
-  }
+  "trailingSlash": false
 }
