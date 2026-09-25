@@ -1,0 +1,41 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Memory Game | Consciousness and Cognition Analyst</title>
+    <script type="module" crossorigin="" src="/assets/index-DQijNHvH.js"></script>
+  <meta name="description" content="Memorize a list of words, then recall as many as you can."><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&amp;family=Space+Mono:wght@400;700&amp;display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&amp;family=Space+Mono:wght@400;700&amp;display=swap"></head>
+  <body>
+    <div id="root"><div style="position: relative; min-height: 100vh; background: rgb(6, 19, 27); color: rgb(233, 229, 218); font-family: &quot;Source Serif 4&quot;, Georgia, serif; display: flex; flex-direction: column; align-items: center;"><style>
+          @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=Space+Mono:wght@400;700&display=swap');
+          * { box-sizing: border-box; }
+          html, body { overflow-x: hidden; max-width: 100%; }
+          button:disabled { opacity: 0.35; cursor: default; }
+          input, textarea { font-family: inherit; }
+          button { -webkit-tap-highlight-color: transparent; }
+          button::-moz-focus-inner { border: 0; }
+          .tile-btn { outline: none; -webkit-tap-highlight-color: transparent; -webkit-appearance: none; appearance: none; }
+          .tile-btn:focus, .tile-btn:active, .tile-btn:focus-visible { outline: none; box-shadow: none; }
+          .nav-btn { outline: none; }
+          .nav-btn:focus, .nav-btn:active, .nav-btn:focus-visible { outline: none; box-shadow: none; }
+
+          @keyframes bouncePop { 0% { transform: scale(1); } 40% { transform: scale(1.14); } 100% { transform: scale(1); } }
+          @keyframes shakeIt { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-8px); } 40% { transform: translateX(7px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(4px); } }
+          @keyframes celebrateFade { 0% { opacity: 0; transform: translateY(6px) scale(0.96); } 15% { opacity: 1; transform: translateY(0) scale(1); } 80% { opacity: 1; } 100% { opacity: 0; } }
+          @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+          @keyframes leetSweep { 0% { background-position: 0% 0; } 100% { background-position: -160% 0; } }
+          @keyframes marqueeScroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+          @keyframes bubbleFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+          @keyframes breathBurst { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: translate(var(--tx), var(--ty)) scale(0.2); opacity: 0; } }
+          @keyframes flowFailPulse { 0%, 100% { background: rgba(201,107,91,0.14); } 50% { background: rgba(201,107,91,0.30); } }
+          @media (prefers-reduced-motion: reduce) {
+            .emotion-marquee-track { animation-duration: 400s !important; }
+          }
+          .fade-in { animation: fadeIn 0.35s ease both; }
+          .nav-btn:hover { background: #B98220 !important; border-color: #B98220 !important; color: #FFFFFF !important; }
+          .hero-btn:hover { background: #F0BD4D !important; border-color: #F0BD4D !important; color: #111820 !important; }
+          .home-footer-link:hover { color: #E2AA3B !important; }
+          .nav-btn:hover .exercise-card-title, .nav-btn:hover .exercise-card-desc { color: #FFFFFF !important; }
+        </style><div aria-hidden="true" style="position: fixed; inset: 0px; overflow: hidden; z-index: 0; pointer-events: none; background: rgb(6, 19, 27);"><div style="position: absolute; inset: 0px; background: radial-gradient(at 50% 15%, rgb(12, 32, 42) 0%, rgb(6, 19, 27) 60%, rgb(4, 13, 19) 100%); opacity: 0.7;"></div></div><div style="position: relative; z-index: 100; width: 100%; max-width: 680px; display: flex; align-items: center; justify-content: space-between; padding: 18px 20px;"><button class="nav-btn" aria-label="Back" style="flex-shrink: 0; font-family: Oswald, &quot;Arial Narrow&quot;, sans-serif; font-weight: 600; font-size: 16px; background: transparent; border: 1px solid rgb(58, 86, 97); border-radius: 6px; padding: 8px 12px; color: rgb(214, 221, 224); cursor: pointer; outline: none;">←</button><div style="position: relative;"><button class="nav-btn" aria-label="Menu" style="flex-shrink: 0; font-family: Oswald, &quot;Arial Narrow&quot;, sans-serif; font-weight: 600; font-size: 16px; background: transparent; border: 1px solid rgb(58, 86, 97); border-radius: 6px; padding: 8px 12px; color: rgb(214, 221, 224); cursor: pointer; outline: none;">☰</button></div></div><main style="position: relative; z-index: 2; width: 100%; max-width: 680px; padding: 10px 20px 80px; min-height: 460px; display: flex; align-items: center; justify-content: center; box-sizing: border-box;"><div class="fade-in" style="display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%; max-width: 400px; margin: 0px auto; text-align: center;"><p style="font-family: Oswald, &quot;Arial Narrow&quot;, sans-serif; font-weight: 600; font-size: 27px; letter-spacing: 0.03em; color: rgb(226, 170, 59); margin: 2px 0px 4px;">Word Memory</p><p style="font-family: Oswald, &quot;Arial Narrow&quot;, sans-serif; font-weight: 500; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: rgb(168, 181, 186); margin: 6px 0px 0px;">Verbal Memory</p><p style="font-family: Oswald, &quot;Arial Narrow&quot;, sans-serif; font-weight: 500; font-size: 15.5px; line-height: 1.7; color: rgb(233, 229, 218); max-width: 480px; margin: 0px;">Memorize the growing list of words, then type them back in the exact order shown.</p><button style="font-family: Oswald, &quot;Arial Narrow&quot;, sans-serif; font-size: 15px; letter-spacing: 0.04em; text-transform: uppercase; background: rgb(88, 180, 159); color: rgb(14, 20, 16); border: none; border-radius: 6px; padding: 13px 24px; cursor: pointer;">Start</button></div></main></div></div>
+  
+
+</body></html>
