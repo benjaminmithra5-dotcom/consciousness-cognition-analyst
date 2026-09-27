@@ -1968,6 +1968,7 @@ function ChessGame() {
   const [paused, setPaused] = useState(false);
   const [lastMove, setLastMove] = useState(null); // { fr, fc, tr, tc } — highlights the most recent move, ours or the computer's
   const [drag, setDrag] = useState(null); // { r, c, piece, x, y, startX, startY } — x/y are board-relative pixel coords, not viewport coords
+  const [gameId, setGameId] = useState(0); // bumped on reset so the engine effect re-runs even when turn stays "w"
 
   const engineColor = playerColor === "w" ? "b" : "w";
   const gameOver = status === "checkmate" || status === "stalemate";
@@ -1997,7 +1998,7 @@ function ChessGame() {
     }, 260);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [turn, gameOver, paused]);
+  }, [turn, gameOver, paused, engineColor, gameId]);
 
   const attemptMove = (fr, fc, tr, tc) => {
     const move = generateLegalMoves(board, state, playerColor).filter((m) => m.fr === fr && m.fc === fc).find((m) => m.tr === tr && m.tc === tc);
@@ -2078,6 +2079,7 @@ function ChessGame() {
     setPaused(false);
     setLastMove(null);
     setDrag(null);
+    setGameId((id) => id + 1);
     clock.start();
   };
 
@@ -3464,7 +3466,7 @@ export default function App() {
           <div style={styles(c).celebrateOverlay} aria-hidden="true"><span style={styles(c).celebrateText}>{celebrate}</span></div>
         )}
 
-        <main style={{ ...styles(c).main, ...(view === "home" ? styles(c).mainHome : {}) }}>
+        <main style={{ ...styles(c).main, ...(view === "home" ? styles(c).mainHome : {}), ...(view === "games" && gameTab === "chess" ? styles(c).mainChess : {}) }}>
           {view === "home" && <HomeScreen onNavigate={navigate} onOpenExercise={goToExercise} />}
 
           {view === "journals" && <PlaceholderScreen title="Journals" note="Reserved for reflections and reading. Coming soon." onNavigate={navigate} />}
@@ -3591,6 +3593,7 @@ function styles(c) {
     eliteVignette: { position: "absolute", inset: 0, background: `radial-gradient(ellipse at 50% 15%, ${c.surface} 0%, ${c.bg} 60%, ${c.playfield} 100%)`, opacity: 0.7 },
 
     mainHome: { padding: 0, maxWidth: "none", width: "100%" },
+    mainChess: { paddingLeft: 4, paddingRight: 4 },
     homeOuter: { position: "relative", width: "100%", display: "flex", justifyContent: "center" },
     homeContent: { position: "relative", zIndex: 1, width: "100%", maxWidth: 560, display: "flex", flexDirection: "column", alignItems: "center", gap: 18, padding: "36px 16px 60px", textAlign: "center" },
     siteHeading: {
@@ -3961,7 +3964,7 @@ function styles(c) {
     nbackCellImage: { fontSize: 34, lineHeight: 1, userSelect: "none", pointerEvents: "none" },
 
     // ---- Chess ----
-    chessWrap: { display: "flex", flexDirection: "column", alignItems: "center", gap: 14, width: "100%", maxWidth: 460, margin: "0 auto" },
+    chessWrap: { display: "flex", flexDirection: "column", alignItems: "center", gap: 14, width: "100%", maxWidth: 560, margin: "0 auto" },
     chessTopRow: { display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" },
     chessTimerBadge: {
       fontFamily: font.mono, fontWeight: 700, fontSize: 14, letterSpacing: "0.06em", color: c.ink, background: c.panel,
@@ -3975,7 +3978,7 @@ function styles(c) {
     },
     chessCheckmateText: { fontFamily: font.display, fontWeight: 700, fontSize: 30, letterSpacing: "0.06em", textTransform: "uppercase", color: c.gold, margin: 0 },
     chessCheckmateSub: { fontFamily: font.mono, fontSize: 15, color: c.ink, margin: 0 },
-    chessBoard: { display: "flex", flexDirection: "column", border: "2px solid #4A2E1B", borderRadius: 4, overflow: "hidden", width: "100%", maxWidth: 420, aspectRatio: "1 / 1", touchAction: "none", position: "relative" },
+    chessBoard: { display: "flex", flexDirection: "column", border: "2px solid #4A2E1B", borderRadius: 4, overflow: "hidden", width: "100%", maxWidth: "min(560px, max(280px, calc(100vh - 200px)))", aspectRatio: "1 / 1", touchAction: "none", position: "relative" },
     chessRow: { display: "flex", flex: 1 },
     chessSquare: {
       flex: 1, aspectRatio: "1 / 1", display: "flex", alignItems: "center", justifyContent: "center",
@@ -3986,7 +3989,7 @@ function styles(c) {
     chessSquareSelected: { boxShadow: `inset 0 0 0 3px ${c.gold}` },
     chessLastMoveTint: { position: "absolute", inset: 0, background: "rgba(246, 200, 60, 0.45)", pointerEvents: "none" },
     chessCheckTint: { position: "absolute", inset: 0, background: "rgba(220, 60, 50, 0.55)", pointerEvents: "none" },
-    chessPieceIconWrap: { width: "88%", height: "88%", display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none", filter: "drop-shadow(0 1px 1.5px rgba(0,0,0,0.4))", zIndex: 1, position: "relative" },
+    chessPieceIconWrap: { width: "94%", height: "94%", display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none", filter: "drop-shadow(0 1px 1.5px rgba(0,0,0,0.4))", zIndex: 1, position: "relative" },
     chessLegalDot: { position: "absolute", width: "22%", height: "22%", borderRadius: "50%", background: "rgba(20,20,20,0.35)", pointerEvents: "none" },
     chessCoordRank: { position: "absolute", top: 2, left: 3, fontFamily: font.mono, fontSize: 10, fontWeight: 700, opacity: 0.8, pointerEvents: "none" },
     chessCoordFile: { position: "absolute", bottom: 1, right: 3, fontFamily: font.mono, fontSize: 10, fontWeight: 700, opacity: 0.8, pointerEvents: "none" },
