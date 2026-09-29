@@ -3238,8 +3238,8 @@ function ContactScreen({ onNavigate }) {
 }
 
 // =================================================================
-// Guide dog: a calm basset hound that lies in the bottom-left corner,
-// takes an occasional slow sniffing walk, and offers a tip for the
+// Guide dog: a calm Great Dane that lies in the bottom-left corner,
+// takes an occasional slow walk, and offers a tip for the
 // current page when tapped. Mounted only in a real browser after
 // load, so it never ends up in the prerendered HTML. Hiding it is kept
 // in memory only (the site stores nothing), so it lasts until reload.
@@ -3260,7 +3260,7 @@ const GUIDE_DOG_CSS = `
   .gd-btn { pointer-events: auto; display: block; background: transparent; border: 0; padding: 4px; margin: 0; cursor: pointer; line-height: 0; border-radius: 10px; -webkit-tap-highlight-color: transparent; }
   .gd-btn:focus { outline: none; }
   .gd-btn:focus-visible, .gd-paw:focus-visible, .gd-hide:focus-visible, .gd-link:focus-visible { outline: 2px solid ${COLORS.gold}; outline-offset: 2px; }
-  .gd-svg { width: 90px; height: auto; display: block; overflow: visible; }
+  .gd-svg { width: 110px; height: auto; display: block; overflow: visible; }
   .gd-bubble {
     pointer-events: auto; position: absolute; left: 4px; bottom: calc(100% + 10px);
     width: max-content; max-width: min(250px, calc(100vw - 40px)); box-sizing: border-box;
@@ -3284,71 +3284,69 @@ const GUIDE_DOG_CSS = `
   .gd-paw:hover { opacity: 1; }
   .gd-part { transform-box: fill-box; }
   .gd-breathe { transform-origin: 50% 100%; animation: gdBreathe 4.8s ease-in-out infinite; }
-  .gd-tail { transform-origin: 100% 100%; animation: gdWag 9s ease-in-out infinite; }
+  .gd-tail { transform-origin: 100% 0%; animation: gdWag 9s ease-in-out infinite; }
   .gd-ear { transform-origin: 50% 0%; animation: gdEar 13s ease-in-out infinite; }
   .gd-bob { animation: gdBob 0.9s ease-in-out infinite; }
-  .gd-leg { transform-origin: 30% 0%; animation: gdStep 0.9s ease-in-out infinite; }
+  .gd-leg { transform-origin: 50% 0%; animation: gdStep 0.9s ease-in-out infinite; }
   .gd-leg-b { animation-delay: -0.45s; }
-  .gd-sniff { transform-origin: 0% 0%; animation: gdSniff 1.2s ease-in-out infinite; }
   @keyframes gdBreathe { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.035); } }
   @keyframes gdWag { 0%, 14%, 100% { transform: rotate(0deg); } 3% { transform: rotate(-9deg); } 6.5% { transform: rotate(5deg); } 10% { transform: rotate(-6deg); } }
   @keyframes gdEar { 0%, 60%, 68%, 100% { transform: rotate(0deg); } 63% { transform: rotate(-7deg); } 65.5% { transform: rotate(2deg); } }
   @keyframes gdBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-0.8px); } }
   @keyframes gdStep { 0%, 100% { transform: rotate(9deg); } 50% { transform: rotate(-9deg); } }
-  @keyframes gdSniff { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(4deg); } }
-  @media (max-width: 600px) { .gd-svg { width: 70px; } }
+  @media (max-width: 600px) { .gd-svg { width: 85px; } }
   @media (prefers-reduced-motion: reduce) {
     .gd-wrap, .gd-wrap * { animation: none !important; transition: none !important; }
   }
 `;
 
-// Original flat line drawing, side view facing right, in the logo's
-// gold-outline style. "lie": resting with head on paws. "walk": nose
-// down, sniffing along.
-function BassetSvg({ pose, facing }) {
+// Original Great Dane silhouette in solid gold, side view facing
+// right, with a few dark cut-out details (eye, mouth, ear edge,
+// collar). "lie": sphinx pose, head up. "walk": standing, head level.
+function GreatDaneSvg({ pose, facing }) {
   const gold = COLORS.gold;
-  const common = { fill: COLORS.bg, stroke: gold, strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round" };
-  return (
-    <svg className="gd-svg" viewBox="0 0 120 56" aria-hidden="true" focusable="false" style={facing < 0 ? { transform: "scaleX(-1)" } : undefined}>
-      {pose === "walk" ? (
-        <g {...common}>
-          <path className="gd-part gd-tail" fill="none" d="M21 24 C14 18 12 11 13 4" />
-          <path className="gd-part gd-leg" d="M25 33 V48 Q25 51 29 51 H32" fill="none" />
-          <path className="gd-part gd-leg gd-leg-b" d="M33 33 V48 Q33 51 37 51 H40" fill="none" />
-          <path className="gd-part gd-leg gd-leg-b" d="M75 33 V48 Q75 51 79 51 H82" fill="none" />
-          <path className="gd-part gd-leg" d="M82 33 V48 Q82 51 86 51 H89" fill="none" />
-          <g className="gd-bob">
-            <path d="M24 38 C16 38 14 28 20 23 C26 18 42 18 58 19 C72 20 82 20 87 25 C90 29 89 36 84 38 Z" />
-            <path fill="none" strokeWidth="1.3" d="M38 19.5 C40 25 48 28 58 27 C66 26 70 23 72 20" />
-            <g className="gd-part gd-sniff">
-              <path d="M84 27 C84 20 91 18 97 21 C101 23 104 27 107 32 L111 39 C113 43 112 47 108 47 C107 50 103 50 100 48 L95 45 C88 41 84 35 84 27 Z" />
-              <circle cx="110" cy="44" r="2.2" fill={gold} />
-              <path fill="none" strokeWidth="1.2" d="M92 22.5 Q95 21.5 98 22.8" />
-              <circle cx="97" cy="28" r="1.2" fill={gold} stroke="none" />
-              <path fill="none" strokeWidth="1.3" d="M94 26.5 Q97 25.3 100 26.8" />
-              <path fill="none" strokeWidth="1.2" d="M94.5 29.5 Q97 32 99.5 29.8" />
-              <path className="gd-part gd-ear" fill={gold} fillOpacity="0.3" d="M89 24 C85 28 83 35 84 42 C84 48 86 52 90 52 C94 53 96 49 95 44 C94 37 94 30 93 25 Z" />
-            </g>
-          </g>
+  const dark = COLORS.bg;
+  const earFill = COLORS.goldDark;
+  const flip = facing < 0 ? { transform: "scaleX(-1)" } : undefined;
+  return pose === "walk" ? (
+    <svg className="gd-svg" viewBox="0 0 124 100" aria-hidden="true" focusable="false" style={flip}>
+      <g fill={gold}>
+        <path className="gd-part gd-leg gd-leg-b" d="M36 44 C44 44 50 52 48 62 L43 78 L43 95 L47 96 C48 96.5 48 98 47 98 L37 98 L37 81 C32 74 29 60 36 44 Z" opacity="0.7" />
+        <path className="gd-part gd-leg gd-leg-b" d="M76 54 L83 54 L83 95 L87 96 C88 96.5 88 98 87 98 L76 98 Z" opacity="0.7" />
+        <path className="gd-part gd-tail" fill="none" stroke={gold} strokeWidth="3.2" strokeLinecap="round" d="M24 42 C17 48 14 58 14 67 C14 71 15.5 73.5 18 74" />
+        <path d="M25 40 C40 37.5 60 37 74 36 C82 35.5 88 38 92 44 C96 50 95 59 88 63 L72 64 C62 64 54 58 46 56 C40 55 34 57 30 56 C22 54 18 45 25 40 Z" />
+        <path d="M70 42 C73 32 79 22 87 13 L100 11 L103 25 C100 33 97 42 95 52 Z" />
+        <path className="gd-part gd-leg" d="M29 43 C38 43 44 51 42 61 L37 78 L37 95 L41 96 C42 96.5 42 98 41 98 L31 98 L31 81 C26 74 22 60 29 43 Z" />
+        <path className="gd-part gd-leg" d="M83 54 L90 54 L90 95 L94 96 C95 96.5 95 98 94 98 L83 98 Z" />
+        <path d="M88 12 C88 7 92 4 98 4 L104 5 C106 6 107 8 108 9 L120 10 C122 10 123 12 123 14 L123 21 C123 23 122 24 120 24 L108 25 C104 26 100 26 97 25 C92 23 88 18 88 12 Z" />
+        <path fill="none" stroke={dark} strokeWidth="1.3" strokeLinecap="round" d="M122.5 18.5 L112 19.5" />
+        <ellipse cx="105" cy="11" rx="1.6" ry="1.2" fill={dark} />
+        <path fill="none" stroke={dark} strokeWidth="2" strokeLinecap="round" d="M82 24.5 L100.5 29" />
+        <g className="gd-part gd-ear">
+          <path fill={earFill} d="M92 6.5 C95.5 4.5 100.5 4.8 102.5 7.5 L101.8 11 C100.8 15 98.8 18.5 96.5 20 C94.5 18.5 93 15 92.2 11 Z" />
+          <path fill="none" stroke={dark} strokeWidth="1" strokeLinecap="round" d="M92.2 8 C92.8 13.5 94.4 17.8 96.5 20 C98.8 18.5 100.8 15 101.8 11" />
         </g>
-      ) : (
-        <g {...common}>
-          <path className="gd-part gd-tail" fill="none" d="M20 34 C12 30 7 23 5 14" />
-          <ellipse cx="26" cy="50" rx="7" ry="2.6" />
-          <path d="M80 44 L99 47.5 C104 48 105 52 101 52 L80 52 Z" />
-          <path className="gd-part gd-breathe" d="M22 50 C14 50 12 40 18 33 C24 26 40 25 56 26 C70 27 81 27 87 32 C91 36 91 46 87 50 Z" />
-          <path fill="none" strokeWidth="1.6" d="M34 34 C27 36 25 45 30 50" />
-          <path fill="none" strokeWidth="1.3" d="M38 27.5 C40 33 48 36 58 35 C66 34 70 31 72 27.6" />
-          <path fill="none" strokeWidth="1.1" d="M97.5 48.5 V51.5 M100.5 48.8 V51.5" />
-          <path d="M86 30 C86 22 94 19 101 22 C105 24 108 27 112 30 L115 32 C118 34 118 39 115 41 C113 43 110 43 108 43 C107 47 103 48 99 47 L92 46 C87 44 85 38 86 30 Z" />
-          <circle cx="115" cy="35.5" r="2.2" fill={gold} />
-          <path fill="none" strokeWidth="1.2" d="M95 25.5 Q98 24.5 101 25.5" />
-          <circle cx="100" cy="30.5" r="1.2" fill={gold} stroke="none" />
-          <path fill="none" strokeWidth="1.3" d="M97 29 Q100 27.8 103 29.3" />
-          <path fill="none" strokeWidth="1.2" d="M97.5 32 Q100 34.5 102.5 32.2" />
-          <path className="gd-part gd-ear" fill={gold} fillOpacity="0.3" d="M91 25 C87 28 85 34 85 41 C85 47 86 52 90 53 C94 54 97 51 96 45 C95 38 95 31 94 26 Z" />
+      </g>
+    </svg>
+  ) : (
+    <svg className="gd-svg" viewBox="0 0 124 64" aria-hidden="true" focusable="false" style={flip}>
+      <g fill={gold}>
+        <path className="gd-part gd-tail" fill="none" stroke={gold} strokeWidth="3" strokeLinecap="round" d="M23 50 C15 54 9 58 5 60 C3 61 3 62.5 5.5 62.5" />
+        <path className="gd-part gd-breathe" d="M20 50 C20 38 30 32 46 32 L72 32 C80 32 86 36 88 44 L89 58 C89 61 87 62 84 62 L26 62 C21 62 19 58 20 54 Z" />
+        <path fill="none" stroke={dark} strokeWidth="1.4" strokeLinecap="round" d="M40 60 C33 56 31 46 37 40 C43 35 52 39 54 47" />
+        <path fill="none" stroke={dark} strokeWidth="1.2" strokeLinecap="round" d="M46 58.5 L60 58.5" />
+        <path d="M82 50 L114 53 C118 53.5 120 55.5 120 58.5 C120 61 119 62 117 62 L82 62 Z" />
+        <path fill="none" stroke={dark} strokeWidth="1.2" strokeLinecap="round" d="M90 57.5 L117 58.2" />
+        <path d="M72 36 C75 26 82 16 88 10 L100 10 L103 22 C100 30 96 38 92 52 L80 52 Z" />
+        <path d="M88 12 C88 7 92 4 98 4 L104 5 C106 6 107 8 108 9 L120 10 C122 10 123 12 123 14 L123 21 C123 23 122 24 120 24 L108 25 C104 26 100 26 97 25 C92 23 88 18 88 12 Z" />
+        <path fill="none" stroke={dark} strokeWidth="1.3" strokeLinecap="round" d="M122.5 18.5 L112 19.5" />
+        <ellipse cx="105" cy="11" rx="1.6" ry="1.2" fill={dark} />
+        <path fill="none" stroke={dark} strokeWidth="2" strokeLinecap="round" d="M82 24 L100 29" />
+        <g className="gd-part gd-ear">
+          <path fill={earFill} d="M92 6.5 C95.5 4.5 100.5 4.8 102.5 7.5 L101.8 11 C100.8 15 98.8 18.5 96.5 20 C94.5 18.5 93 15 92.2 11 Z" />
+          <path fill="none" stroke={dark} strokeWidth="1" strokeLinecap="round" d="M92.2 8 C92.8 13.5 94.4 17.8 96.5 20 C98.8 18.5 100.8 15 101.8 11" />
         </g>
-      )}
+      </g>
     </svg>
   );
 }
@@ -3405,7 +3403,7 @@ function GuideDog({ view }) {
 
   useEffect(() => () => clearTimeout(walkEndRef.current), []);
 
-  // Every 20 to 40 seconds, maybe get up and sniff a short way along
+  // Every 20 to 40 seconds, maybe get up and walk a short way along
   // the bottom edge, then lie down again.
   useEffect(() => {
     if (!ready || hidden || open || reducedMotion || walk.walking) return;
@@ -3482,7 +3480,7 @@ function GuideDog({ view }) {
             aria-controls={open ? "gd-tip" : undefined}
             onClick={onDogClick}
           >
-            <BassetSvg pose={walk.walking ? "walk" : "lie"} facing={walk.facing} />
+            <GreatDaneSvg pose={walk.walking ? "walk" : "lie"} facing={walk.facing} />
           </button>
         </div>
       )}
