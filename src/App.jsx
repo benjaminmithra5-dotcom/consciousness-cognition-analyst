@@ -800,10 +800,8 @@ function getContrastText(hex) {
   return luminance > 0.42 ? "#1B140D" : "#F3ECDD";
 }
 
-function HomeScreen({ onNavigate, onOpenExercise }) {
+function WriteToMeForm({ style }) {
   const c = useColors();
-  const orderRef = useRef(shuffle(DAILY_QUESTIONS));
-  const [qIndex, setQIndex] = useState(0);
   const [wtmName, setWtmName] = useState("");
   const [wtmEmail, setWtmEmail] = useState("");
   const [wtmMessage, setWtmMessage] = useState("");
@@ -834,6 +832,41 @@ function HomeScreen({ onNavigate, onOpenExercise }) {
     }
   };
 
+  return (
+    <div style={{ ...styles(c).writeToMeWrap, ...style }}>
+      <p style={styles(c).contactSubhead}>Write to Me</p>
+
+      <div style={styles(c).writeToMeField}>
+        <label style={styles(c).writeToMeLabel}>Name <span style={styles(c).writeToMeRequired}>*</span></label>
+        <input type="text" style={styles(c).writeToMeInput} value={wtmName} onChange={(e) => setWtmName(e.target.value)} />
+      </div>
+
+      <div style={styles(c).writeToMeField}>
+        <label style={styles(c).writeToMeLabel}>Email id <span style={styles(c).writeToMeRequired}>*</span></label>
+        <input type="email" style={styles(c).writeToMeInput} value={wtmEmail} onChange={(e) => setWtmEmail(e.target.value)} />
+      </div>
+
+      <div style={styles(c).writeToMeField}>
+        <label style={styles(c).writeToMeLabel}>Message <span style={styles(c).writeToMeRequired}>*</span></label>
+        <textarea style={styles(c).writeToMeTextarea} value={wtmMessage} onChange={(e) => setWtmMessage(e.target.value)} />
+      </div>
+
+      {wtmError && <p style={styles(c).writeToMeError}>{wtmError}</p>}
+      {wtmStatus === "sent" && <p style={styles(c).writeToMeSuccess}>Message sent. Thank you, I'll get back to you soon.</p>}
+      {wtmStatus === "failed" && <p style={styles(c).writeToMeError}>Something went wrong sending that. Please try again in a moment.</p>}
+
+      <button type="button" style={styles(c).btnPrimary} onClick={handleWtmSubmit} disabled={wtmStatus === "sending"}>
+        {wtmStatus === "sending" ? "Sending…" : "Submit"}
+      </button>
+    </div>
+  );
+}
+
+function HomeScreen({ onNavigate, onOpenExercise }) {
+  const c = useColors();
+  const orderRef = useRef(shuffle(DAILY_QUESTIONS));
+  const [qIndex, setQIndex] = useState(0);
+
   useEffect(() => {
     const id = setInterval(() => {
       setQIndex((i) => {
@@ -862,32 +895,7 @@ function HomeScreen({ onNavigate, onOpenExercise }) {
           <p key={qIndex} className="fade-in" style={styles(c).homeQuestion}>{question}</p>
         </div>
 
-        <div style={styles(c).writeToMeWrap}>
-          <p style={styles(c).contactSubhead}>Write to Me</p>
-
-          <div style={styles(c).writeToMeField}>
-            <label style={styles(c).writeToMeLabel}>Name <span style={styles(c).writeToMeRequired}>*</span></label>
-            <input type="text" style={styles(c).writeToMeInput} value={wtmName} onChange={(e) => setWtmName(e.target.value)} />
-          </div>
-
-          <div style={styles(c).writeToMeField}>
-            <label style={styles(c).writeToMeLabel}>Email id <span style={styles(c).writeToMeRequired}>*</span></label>
-            <input type="email" style={styles(c).writeToMeInput} value={wtmEmail} onChange={(e) => setWtmEmail(e.target.value)} />
-          </div>
-
-          <div style={styles(c).writeToMeField}>
-            <label style={styles(c).writeToMeLabel}>Message <span style={styles(c).writeToMeRequired}>*</span></label>
-            <textarea style={styles(c).writeToMeTextarea} value={wtmMessage} onChange={(e) => setWtmMessage(e.target.value)} />
-          </div>
-
-          {wtmError && <p style={styles(c).writeToMeError}>{wtmError}</p>}
-          {wtmStatus === "sent" && <p style={styles(c).writeToMeSuccess}>Message sent. Thank you, I'll get back to you soon.</p>}
-          {wtmStatus === "failed" && <p style={styles(c).writeToMeError}>Something went wrong sending that. Please try again in a moment.</p>}
-
-          <button type="button" style={styles(c).btnPrimary} onClick={handleWtmSubmit} disabled={wtmStatus === "sending"}>
-            {wtmStatus === "sending" ? "Sending…" : "Submit"}
-          </button>
-        </div>
+        <WriteToMeForm />
 
         <p style={styles(c).homePhilosophy}>{PHILOSOPHY_TEXT}</p>
 
@@ -3180,6 +3188,8 @@ function ContactScreen({ onNavigate }) {
             <EmailIcon /><span>Email</span>
           </a>
         </div>
+
+        <WriteToMeForm style={styles(c).writeToMeInCard} />
       </div>
 
       <p style={styles(c).homeFooterLine}>
@@ -3826,6 +3836,7 @@ function styles(c) {
       background: c.surface, border: `1px solid ${c.line}`, borderRadius: 12, padding: "22px 22px 24px", boxSizing: "border-box", textAlign: "center",
     },
     consultTeaserText: { fontFamily: font.display, fontWeight: 500, fontSize: 16, color: c.ink, margin: 0 },
+    writeToMeInCard: { maxWidth: "100%", marginTop: 10 },
     writeToMeField: { display: "flex", flexDirection: "column", gap: 6 },
     writeToMeLabel: { fontFamily: font.display, fontWeight: 500, fontSize: 13, letterSpacing: "0.04em", textTransform: "uppercase", color: c.muted },
     writeToMeRequired: { color: c.bad },
