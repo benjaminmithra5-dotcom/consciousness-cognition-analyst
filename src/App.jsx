@@ -887,9 +887,10 @@ function HomeScreen({ onNavigate, onOpenExercise }) {
     <div style={styles(c).homeOuter}>
       <div style={styles(c).homeContent}>
         <h1 style={styles(c).siteHeading}>
-          <img src="/logo.png" alt="" width="256" height="256" style={styles(c).siteLogo} />
+          <img src="/logo.png" alt="Benjamin Mithra, Mind Interpreter logo" width="256" height="256" style={styles(c).siteLogo} />
           <span style={styles(c).siteHeadingLine}>{SITE_HEADING}</span>
         </h1>
+        <p style={styles(c).siteSubtitle}>Hi, I'm Benjamin Mithra</p>
 
         <div style={styles(c).homeQuestionBox}>
           <p key={qIndex} className="fade-in" style={styles(c).homeQuestion}>{question}</p>
@@ -3592,6 +3593,7 @@ function styles(c) {
     },
     siteLogo: { width: "clamp(40px, 11vw, 60px)", height: "auto", flexShrink: 0, display: "block" },
     siteHeadingLine: { display: "block", whiteSpace: "nowrap" },
+    siteSubtitle: { fontFamily: font.body, fontSize: 19, lineHeight: 1.5, color: c.ink, margin: "-8px 0 0", textAlign: "center" },
     heroButtonsGrid: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10, marginTop: 4, width: "100%", maxWidth: 300 },
     heroBtn: {
       fontFamily: font.display, fontWeight: 500, fontSize: 14, letterSpacing: "0.05em", textTransform: "uppercase",
