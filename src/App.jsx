@@ -669,8 +669,7 @@ function CosmicBackground() {
 // =================================================================
 // Home screen
 // =================================================================
-const SITE_HEADING_LINE_1 = "Mind";
-const SITE_HEADING_LINE_2 = "Interpreter";
+const SITE_HEADING = "Mind Interpreter";
 const LEET_MESSAGE = "Th3 m1nd 1s n0t 4 f1x3d th1ng, 1t 3v0lv3s w1th 3v3ry qu3st10n w3 4sk. 4w4r3n3ss sh4p3s 0ur p3rc3pt10n, wh1l3 m3m0ry, 4tt3nt10n, 1ntu1t10n 4nd r34s0n1ng sh4p3 h0w w3 1nt3rpr3t th3 w0rld. P4r4psych0l0gy 1nv1t3s us t0 3xpl0r3 wh4t l13s b3y0nd 0rd1n4ry 0bs3rv4t10n, wh1l3 c0gn1t10n h3lps us qu3st10n wh4t w3 th1nk w3 kn0w. Th3r3 1s 4lw4ys m0r3 t0 3xpl0r3, 4nd th3 m1nd 1s th3 pl4c3 t0 st4rt.";
 
 const PHILOSOPHY_TEXT = "There is more to experience than what the conscious mind immediately explains. Perception can be subtle, intuition can arrive before reasoning, and altered states can reveal unfamiliar ways of experiencing ourselves and the world. Anomalous experiences invite us to question where the boundaries of ordinary perception truly lie. This space is an exploration of those possibilities through curiosity, practice and an open mind.";
@@ -855,8 +854,8 @@ function HomeScreen({ onNavigate, onOpenExercise }) {
     <div style={styles(c).homeOuter}>
       <div style={styles(c).homeContent}>
         <h1 style={styles(c).siteHeading}>
-          <span style={styles(c).siteHeadingLine}>{SITE_HEADING_LINE_1}</span>
-          <span style={styles(c).siteHeadingLine}>{SITE_HEADING_LINE_2}</span>
+          <img src="/logo.png" alt="" width="256" height="256" style={styles(c).siteLogo} />
+          <span style={styles(c).siteHeadingLine}>{SITE_HEADING}</span>
         </h1>
 
         <div style={styles(c).homeQuestionBox}>
@@ -3572,10 +3571,11 @@ function styles(c) {
       fontFamily: font.display, fontWeight: 700, fontStyle: "normal",
       fontSize: "clamp(24px, 6vw, 32px)", letterSpacing: "0.09em", lineHeight: 1.45, textTransform: "uppercase",
       color: c.gold, margin: "6px 0 0", textAlign: "center",
-      display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8,
+      display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: "clamp(10px, 3vw, 16px)",
       width: "100%", maxWidth: 720, padding: "0 16px", boxSizing: "border-box",
     },
-    siteHeadingLine: { display: "block" },
+    siteLogo: { width: "clamp(40px, 11vw, 60px)", height: "auto", flexShrink: 0, display: "block" },
+    siteHeadingLine: { display: "block", whiteSpace: "nowrap" },
     heroButtonsGrid: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10, marginTop: 4, width: "100%", maxWidth: 300 },
     heroBtn: {
       fontFamily: font.display, fontWeight: 500, fontSize: 14, letterSpacing: "0.05em", textTransform: "uppercase",
