@@ -671,19 +671,6 @@ function CosmicBackground() {
 // =================================================================
 const SITE_HEADING_LINE_1 = "Consciousness and";
 const SITE_HEADING_LINE_2 = "Cognition Analyst";
-const BIO_BUBBLES = [
-  "Hi, I'm Benjamin Mithra!",
-  "A Consciousness & Cognition Analyst.",
-  "I explore the mind",
-  "Since 8 years",
-  "Memory",
-  "Mindfulness",
-  "Hypnosis",
-  "Cognition",
-  "Parapsychology",
-  "Anomalous experiences",
-  "Paranormal Investigations",
-];
 const LEET_MESSAGE = "Th3 m1nd 1s n0t 4 f1x3d th1ng, 1t 3v0lv3s w1th 3v3ry qu3st10n w3 4sk. 4w4r3n3ss sh4p3s 0ur p3rc3pt10n, wh1l3 m3m0ry, 4tt3nt10n, 1ntu1t10n 4nd r34s0n1ng sh4p3 h0w w3 1nt3rpr3t th3 w0rld. P4r4psych0l0gy 1nv1t3s us t0 3xpl0r3 wh4t l13s b3y0nd 0rd1n4ry 0bs3rv4t10n, wh1l3 c0gn1t10n h3lps us qu3st10n wh4t w3 th1nk w3 kn0w. Th3r3 1s 4lw4ys m0r3 t0 3xpl0r3, 4nd th3 m1nd 1s th3 pl4c3 t0 st4rt.";
 
 const PHILOSOPHY_TEXT = "There is more to experience than what the conscious mind immediately explains. Perception can be subtle, intuition can arrive before reasoning, and altered states can reveal unfamiliar ways of experiencing ourselves and the world. Anomalous experiences invite us to question where the boundaries of ordinary perception truly lie. This space is an exploration of those possibilities through curiosity, practice and an open mind.";
@@ -818,16 +805,11 @@ function HomeScreen({ onNavigate, onOpenExercise }) {
   const c = useColors();
   const orderRef = useRef(shuffle(DAILY_QUESTIONS));
   const [qIndex, setQIndex] = useState(0);
-  const writeToMeRef = useRef(null);
   const [wtmName, setWtmName] = useState("");
   const [wtmEmail, setWtmEmail] = useState("");
   const [wtmMessage, setWtmMessage] = useState("");
   const [wtmError, setWtmError] = useState("");
   const [wtmStatus, setWtmStatus] = useState("idle"); // idle | sending | sent | failed
-
-  const scrollToWriteToMe = () => {
-    writeToMeRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
 
   const handleWtmSubmit = async () => {
     if (!wtmName.trim() || !wtmEmail.trim() || !wtmMessage.trim()) {
@@ -881,16 +863,6 @@ function HomeScreen({ onNavigate, onOpenExercise }) {
           <p key={qIndex} className="fade-in" style={styles(c).homeQuestion}>{question}</p>
         </div>
 
-        <div style={styles(c).bioBlock}>
-          {BIO_BUBBLES.map((line, i) => (
-            <span key={i} style={{ ...styles(c).bioBubble, animationDelay: `${(i * 0.35).toFixed(2)}s` }}>{line}</span>
-          ))}
-        </div>
-
-        <div style={styles(c).heroButtonsGrid}>
-          <button className="nav-btn hero-btn" style={styles(c).heroBtnWide} onClick={scrollToWriteToMe}>Write to Me</button>
-        </div>
-
         <p style={styles(c).homePhilosophy}>{PHILOSOPHY_TEXT}</p>
 
         <HomeAmbientBreathing onOpenExercise={onOpenExercise} />
@@ -907,7 +879,7 @@ function HomeScreen({ onNavigate, onOpenExercise }) {
           <Link to={VIEW_PATH.rvlab} className="nav-btn hero-btn" style={styles(c).heroBtn}>View</Link>
         </div>
 
-        <div ref={writeToMeRef} style={styles(c).writeToMeWrap}>
+        <div style={styles(c).writeToMeWrap}>
           <p style={styles(c).contactSubhead}>Write to Me</p>
 
           <div style={styles(c).writeToMeField}>
@@ -3604,25 +3576,12 @@ function styles(c) {
       width: "100%", maxWidth: 720, padding: "0 16px", boxSizing: "border-box",
     },
     siteHeadingLine: { display: "block" },
-    bioBlock: { display: "flex", flexWrap: "wrap", justifyContent: "center", alignItems: "center", gap: 10, maxWidth: 540 },
-    bioBubble: {
-      fontFamily: font.bio, fontStyle: "normal", fontWeight: 400, fontSize: 15.5, lineHeight: 1.3, color: c.ink,
-      background: "rgba(255,255,255,0.045)", border: "1px solid #29414B", borderRadius: 999, padding: "10px 18px",
-      display: "inline-block", animation: "bubbleFloat 5.5s ease-in-out infinite",
-    },
-
     heroButtonsGrid: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10, marginTop: 4, width: "100%", maxWidth: 300 },
     heroBtn: {
       fontFamily: font.display, fontWeight: 500, fontSize: 14, letterSpacing: "0.05em", textTransform: "uppercase",
       background: c.gold, color: "#111820", border: `1px solid ${c.gold}`, borderRadius: 6, padding: "9px 20px", cursor: "pointer",
       width: "100%", transition: "background 0.15s ease, border-color 0.15s ease",
     },
-    heroBtnWide: {
-      fontFamily: font.display, fontWeight: 500, fontSize: 14, letterSpacing: "0.05em", textTransform: "uppercase",
-      background: c.gold, color: "#111820", border: `1px solid ${c.gold}`, borderRadius: 6, padding: "9px 20px", cursor: "pointer",
-      width: "100%", gridColumn: "1 / -1", transition: "background 0.15s ease, border-color 0.15s ease",
-    },
-
     leetWrap: {
       position: "relative", width: "100%", maxWidth: 480, display: "flex", alignItems: "center", justifyContent: "center",
       overflow: "hidden", borderRadius: 12, padding: "24px 22px", border: "1px solid #29414B", background: "#081820",
