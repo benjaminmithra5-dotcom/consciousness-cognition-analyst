@@ -863,22 +863,6 @@ function HomeScreen({ onNavigate, onOpenExercise }) {
           <p key={qIndex} className="fade-in" style={styles(c).homeQuestion}>{question}</p>
         </div>
 
-        <p style={styles(c).homePhilosophy}>{PHILOSOPHY_TEXT}</p>
-
-        <HomeAmbientBreathing onOpenExercise={onOpenExercise} />
-
-        <button type="button" style={styles(c).leetWrap} onClick={() => onOpenExercise("leet")} aria-label="Open Leetspeak Reading exercise">
-          <div style={styles(c).leetSweep} aria-hidden="true" />
-          <p style={styles(c).leetText}>{LEET_MESSAGE}</p>
-        </button>
-
-        <div style={styles(c).heroButtonsGrid}>
-          <Link to={VIEW_PATH.journals} className="nav-btn hero-btn" style={styles(c).heroBtn}>Read</Link>
-          <Link to={VIEW_PATH.exercises} className="nav-btn hero-btn" style={styles(c).heroBtn}>Exercise</Link>
-          <Link to={VIEW_PATH.games} className="nav-btn hero-btn" style={styles(c).heroBtn}>Play</Link>
-          <Link to={VIEW_PATH.rvlab} className="nav-btn hero-btn" style={styles(c).heroBtn}>View</Link>
-        </div>
-
         <div style={styles(c).writeToMeWrap}>
           <p style={styles(c).contactSubhead}>Write to Me</p>
 
@@ -904,6 +888,22 @@ function HomeScreen({ onNavigate, onOpenExercise }) {
           <button type="button" style={styles(c).btnPrimary} onClick={handleWtmSubmit} disabled={wtmStatus === "sending"}>
             {wtmStatus === "sending" ? "Sending…" : "Submit"}
           </button>
+        </div>
+
+        <p style={styles(c).homePhilosophy}>{PHILOSOPHY_TEXT}</p>
+
+        <HomeAmbientBreathing onOpenExercise={onOpenExercise} />
+
+        <button type="button" style={styles(c).leetWrap} onClick={() => onOpenExercise("leet")} aria-label="Open Leetspeak Reading exercise">
+          <div style={styles(c).leetSweep} aria-hidden="true" />
+          <p style={styles(c).leetText}>{LEET_MESSAGE}</p>
+        </button>
+
+        <div style={styles(c).heroButtonsGrid}>
+          <Link to={VIEW_PATH.journals} className="nav-btn hero-btn" style={styles(c).heroBtn}>Read</Link>
+          <Link to={VIEW_PATH.exercises} className="nav-btn hero-btn" style={styles(c).heroBtn}>Exercise</Link>
+          <Link to={VIEW_PATH.games} className="nav-btn hero-btn" style={styles(c).heroBtn}>Play</Link>
+          <Link to={VIEW_PATH.rvlab} className="nav-btn hero-btn" style={styles(c).heroBtn}>View</Link>
         </div>
 
         <div style={styles(c).consultTeaserWrap}>
