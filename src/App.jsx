@@ -3127,7 +3127,12 @@ function RVLabScreen() {
 const WHATSAPP_NUMBER = "447440573315";
 const EMAIL_ADDRESS = "benjaminmithra@gmail.com";
 const FORMSPREE_ENDPOINT = "https://formspree.io/f/xjyvqwrd";
-const CONTACT_AREAS = ["Parapsychology and anomalous experiences","Hypnosis","Habit Change and Behavioral Responses","Beliefs and Cognitive Patterns","Mindfulness and Awareness","Memory and Cognitive Performance","Paradox Deconditioning","Paranormal Investigation"];
+const CONTACT_INTRO_BUBBLES = ["Hi, I'm Benjamin Mithra.", "I'm a Mind Interpreter.", "You talk. I listen. We explore."];
+const CONTACT_INTRO_PARAGRAPHS = [
+  "Sometimes you simply need someone who will listen without rushing to judge, advise, or tell you what to do.",
+  "You can bring whatever is on your mind. Something you're going through, a difficult decision, a recurring thought or pattern, an experience you don't understand, or simply something you've never had the space to talk about.",
+  "You don't need to prepare anything or know exactly where the conversation should go.",
+];
 
 function WhatsAppIcon() {
   return (
@@ -3151,20 +3156,18 @@ function ContactScreen({ onNavigate }) {
       <div style={styles(c).contactCard}>
         <p ref={headingRef} style={styles(c).contactBigHeading}>Private Consultation</p>
 
-        <p style={styles(c).contactSubhead}>Areas I work with</p>
-        <div style={styles(c).contactAreaGrid}>
-          {CONTACT_AREAS.map((a, i) => (
-            <span key={i} style={{ ...styles(c).contactAreaChip, animationDelay: `${(i * 0.3).toFixed(2)}s` }}>{a}</span>
+        <div style={styles(c).contactBubbleStack}>
+          {CONTACT_INTRO_BUBBLES.map((b, i) => (
+            <span key={i} style={{ ...styles(c).contactBubble, animationDelay: `${(i * 0.4).toFixed(2)}s` }}>{b}</span>
           ))}
         </div>
 
         <div style={styles(c).contactDivider} />
 
-        <p style={styles(c).contactBody}>My interest in this field began long before it became my work, and it has only grown deeper with time. Wherever you are is a good place to begin, and we'll move forward together.</p>
-
-        <div style={styles(c).contactPriceRow}>
-          <span style={styles(c).contactPriceBadge}>$110<span style={styles(c).contactPriceUnit}> USD / session</span></span>
-        </div>
+        {CONTACT_INTRO_PARAGRAPHS.map((t, i) => (
+          <p key={i} style={styles(c).contactBody}>{t}</p>
+        ))}
+        <p style={styles(c).contactClosing}>This is a private space for conversation, reflection and understanding.</p>
 
         <div style={styles(c).contactDivider} />
 
@@ -3257,7 +3260,7 @@ const PAGE_META = {
   "game-words": { title: "Word Memory Game | Mind Interpreter", description: "Memorize a list of words, then recall as many as you can." },
   "game-numbers": { title: "Number Memory Game | Mind Interpreter", description: "Memorize a growing sequence of digits and recall it back correctly." },
   rvlab: { title: "Remote Viewing Lab | Mind Interpreter", description: "Practice remote viewing with a freehand sketch, session notes, and a hidden target reveal, exploring anomalous perception and parapsychology." },
-  contact: { title: "Private Consultation | Benjamin Mithra, Mind Interpreter", description: "Book a private one to one consultation with Benjamin Mithra covering habit change, hypnosis, mindfulness, cognitive performance, and parapsychology, $110 USD per session." },
+  contact: { title: "Private Consultation | Benjamin Mithra, Mind Interpreter", description: "A private one to one conversation with Benjamin Mithra, a Mind Interpreter. You talk, I listen, we explore: a space for conversation, reflection, and understanding." },
   privacy: { title: "Privacy Policy | Mind Interpreter", description: "How this site handles data: no accounts, no tracking, and what actually happens with the Write to Me form." },
   terms: { title: "Terms | Mind Interpreter", description: "Terms for using this site's games, exercises, and remote viewing content." },
   disclaimer: { title: "Disclaimer | Mind Interpreter", description: "This site is educational and experimental, and is not a substitute for medical, psychiatric, or licensed psychological care." },
@@ -3811,12 +3814,7 @@ function styles(c) {
     contactBigHeading: { fontFamily: font.display, fontWeight: 700, fontSize: 32, letterSpacing: "0.03em", textTransform: "uppercase", color: c.gold, margin: "0 0 10px", lineHeight: 1.3 },
     contactBody: { fontSize: 14.5, lineHeight: 1.75, color: c.muted, margin: 0 },
     contactDivider: { height: 1, background: `linear-gradient(90deg, ${c.line} 0%, transparent 90%)`, width: "100%", margin: "2px 0" },
-    contactPriceRow: { display: "flex" },
-    contactPriceBadge: {
-      display: "inline-flex", alignItems: "baseline", fontFamily: font.display, fontSize: 30, letterSpacing: "0.02em",
-      color: "#0E1410", background: c.gold, borderRadius: 999, padding: "8px 22px",
-    },
-    contactPriceUnit: { fontFamily: font.body, fontSize: 13, letterSpacing: "0.02em", marginLeft: 4 },
+    contactClosing: { fontFamily: font.body, fontStyle: "italic", fontSize: 15.5, lineHeight: 1.7, color: c.ink, margin: "6px 0 0" },
     contactSubhead: { fontFamily: font.display, fontSize: 19, letterSpacing: "0.06em", textTransform: "uppercase", color: c.gold, margin: "8px 0 6px" },
 
     writeToMeWrap: {
@@ -3841,10 +3839,10 @@ function styles(c) {
     },
     writeToMeError: { fontFamily: font.display, fontWeight: 500, fontSize: 13.5, color: c.bad, margin: 0 },
     writeToMeSuccess: { fontFamily: font.display, fontWeight: 500, fontSize: 13.5, color: c.good, margin: 0 },
-    contactAreaGrid: { display: "flex", flexWrap: "wrap", gap: 8 },
-    contactAreaChip: {
-      fontFamily: font.body, fontSize: 13, lineHeight: 1.4, color: c.ink, background: "rgba(255,255,255,0.04)",
-      border: `1px solid ${c.line}`, borderRadius: 999, padding: "7px 14px", display: "inline-block",
+    contactBubbleStack: { display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 10 },
+    contactBubble: {
+      fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: c.ink, background: "rgba(255,255,255,0.05)",
+      border: `1px solid ${c.strongLine}`, borderRadius: "18px 18px 18px 4px", padding: "10px 18px", display: "inline-block",
       animation: "bubbleFloat 5.5s ease-in-out infinite",
     },
     contactIconsRow: { display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 14, marginTop: 2 },
