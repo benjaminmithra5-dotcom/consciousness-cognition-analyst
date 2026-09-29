@@ -669,8 +669,8 @@ function CosmicBackground() {
 // =================================================================
 // Home screen
 // =================================================================
-const SITE_HEADING_LINE_1 = "Consciousness and";
-const SITE_HEADING_LINE_2 = "Cognition Analyst";
+const SITE_HEADING_LINE_1 = "Mind";
+const SITE_HEADING_LINE_2 = "Interpreter";
 const LEET_MESSAGE = "Th3 m1nd 1s n0t 4 f1x3d th1ng, 1t 3v0lv3s w1th 3v3ry qu3st10n w3 4sk. 4w4r3n3ss sh4p3s 0ur p3rc3pt10n, wh1l3 m3m0ry, 4tt3nt10n, 1ntu1t10n 4nd r34s0n1ng sh4p3 h0w w3 1nt3rpr3t th3 w0rld. P4r4psych0l0gy 1nv1t3s us t0 3xpl0r3 wh4t l13s b3y0nd 0rd1n4ry 0bs3rv4t10n, wh1l3 c0gn1t10n h3lps us qu3st10n wh4t w3 th1nk w3 kn0w. Th3r3 1s 4lw4ys m0r3 t0 3xpl0r3, 4nd th3 m1nd 1s th3 pl4c3 t0 st4rt.";
 
 const PHILOSOPHY_TEXT = "There is more to experience than what the conscious mind immediately explains. Perception can be subtle, intuition can arrive before reasoning, and altered states can reveal unfamiliar ways of experiencing ourselves and the world. Anomalous experiences invite us to question where the boundaries of ordinary perception truly lie. This space is an exploration of those possibilities through curiosity, practice and an open mind.";
@@ -3243,25 +3243,25 @@ const EXERCISE_KEY_FROM_SLUG = Object.fromEntries(Object.entries(EXERCISE_SLUG).
 // change (including on the very first load, which is what the
 // prerender step below captures into the static HTML for that URL).
 const PAGE_META = {
-  home: { title: "Consciousness and Cognition Analyst | Benjamin Mithra", description: "Cognitive performance consultation, mindfulness exercises, memory games, and remote viewing practice with Benjamin Mithra, a Consciousness and Cognition Analyst." },
-  journals: { title: "Journals | Consciousness and Cognition Analyst", description: "Reflections and reading on consciousness, cognition, and mindfulness from Benjamin Mithra. New journal entries coming soon." },
-  exercises: { title: "Mindfulness and Cognitive Exercises | Consciousness and Cognition Analyst", description: "Guided mindfulness breathing, leetspeak reading, flow typing, and Guilford's divergent thinking test to train focus, calm, and cognitive fluency." },
-  "exercise-breathing": { title: "Mindfulness Breathing Exercise | Consciousness and Cognition Analyst", description: "A guided breathing exercise: inhale, hold, exhale, and hold again, paced to help you slow down and breathe more deliberately." },
-  "exercise-leet": { title: "Leetspeak Reading Exercise | Consciousness and Cognition Analyst", description: "Decode short stories written in leetspeak to train visual attention, pattern recognition, and reading fluency." },
-  "exercise-flowtype": { title: "Flow Type Exercise | Consciousness and Cognition Analyst", description: "Type continuously without stopping to build sustained focus and mental stamina under light pressure." },
-  "exercise-guilford": { title: "Guilford's Test | Consciousness and Cognition Analyst", description: "A classic divergent thinking task: name unusual uses for an everyday object to exercise creative fluency." },
-  games: { title: "Memory and Cognitive Games | Consciousness and Cognition Analyst", description: "Chess, Recall, N Back, Card Memory, Word Memory, and Number Memory: games built to train focus, memory, and pattern recognition." },
-  "game-chess": { title: "Chess | Consciousness and Cognition Analyst", description: "Play chess against a built in engine, with a running timer and alternating colors each game." },
-  "game-everyday": { title: "Recall: Everyday Memory Games | Consciousness and Cognition Analyst", description: "A rotating set of quick memory games: Digit Span, Word Recall, Kim's Game, Pattern Recall, Flash Grid, and Detective Case." },
-  "game-nback": { title: "N Back Memory Game | Consciousness and Cognition Analyst", description: "A classic working memory task: spot the repeated pattern one step back in a moving sequence." },
-  "game-cards": { title: "Card Memory Game | Consciousness and Cognition Analyst", description: "Memorize the positions of cards, then match pairs from memory." },
-  "game-words": { title: "Word Memory Game | Consciousness and Cognition Analyst", description: "Memorize a list of words, then recall as many as you can." },
-  "game-numbers": { title: "Number Memory Game | Consciousness and Cognition Analyst", description: "Memorize a growing sequence of digits and recall it back correctly." },
-  rvlab: { title: "Remote Viewing Lab | Consciousness and Cognition Analyst", description: "Practice remote viewing with a freehand sketch, session notes, and a hidden target reveal, exploring anomalous perception and parapsychology." },
-  contact: { title: "Private Consultation | Benjamin Mithra, Consciousness and Cognition Analyst", description: "Book a private one to one consultation with Benjamin Mithra covering habit change, hypnosis, mindfulness, cognitive performance, and parapsychology, $110 USD per session." },
-  privacy: { title: "Privacy Policy | Consciousness and Cognition Analyst", description: "How this site handles data: no accounts, no tracking, and what actually happens with the Write to Me form." },
-  terms: { title: "Terms | Consciousness and Cognition Analyst", description: "Terms for using this site's games, exercises, and remote viewing content." },
-  disclaimer: { title: "Disclaimer | Consciousness and Cognition Analyst", description: "This site is educational and experimental, and is not a substitute for medical, psychiatric, or licensed psychological care." },
+  home: { title: "Mind Interpreter | Benjamin Mithra", description: "Cognitive performance consultation, mindfulness exercises, memory games, and remote viewing practice with Benjamin Mithra, a Mind Interpreter." },
+  journals: { title: "Journals | Mind Interpreter", description: "Reflections and reading on consciousness, cognition, and mindfulness from Benjamin Mithra. New journal entries coming soon." },
+  exercises: { title: "Mindfulness and Cognitive Exercises | Mind Interpreter", description: "Guided mindfulness breathing, leetspeak reading, flow typing, and Guilford's divergent thinking test to train focus, calm, and cognitive fluency." },
+  "exercise-breathing": { title: "Mindfulness Breathing Exercise | Mind Interpreter", description: "A guided breathing exercise: inhale, hold, exhale, and hold again, paced to help you slow down and breathe more deliberately." },
+  "exercise-leet": { title: "Leetspeak Reading Exercise | Mind Interpreter", description: "Decode short stories written in leetspeak to train visual attention, pattern recognition, and reading fluency." },
+  "exercise-flowtype": { title: "Flow Type Exercise | Mind Interpreter", description: "Type continuously without stopping to build sustained focus and mental stamina under light pressure." },
+  "exercise-guilford": { title: "Guilford's Test | Mind Interpreter", description: "A classic divergent thinking task: name unusual uses for an everyday object to exercise creative fluency." },
+  games: { title: "Memory and Cognitive Games | Mind Interpreter", description: "Chess, Recall, N Back, Card Memory, Word Memory, and Number Memory: games built to train focus, memory, and pattern recognition." },
+  "game-chess": { title: "Chess | Mind Interpreter", description: "Play chess against a built in engine, with a running timer and alternating colors each game." },
+  "game-everyday": { title: "Recall: Everyday Memory Games | Mind Interpreter", description: "A rotating set of quick memory games: Digit Span, Word Recall, Kim's Game, Pattern Recall, Flash Grid, and Detective Case." },
+  "game-nback": { title: "N Back Memory Game | Mind Interpreter", description: "A classic working memory task: spot the repeated pattern one step back in a moving sequence." },
+  "game-cards": { title: "Card Memory Game | Mind Interpreter", description: "Memorize the positions of cards, then match pairs from memory." },
+  "game-words": { title: "Word Memory Game | Mind Interpreter", description: "Memorize a list of words, then recall as many as you can." },
+  "game-numbers": { title: "Number Memory Game | Mind Interpreter", description: "Memorize a growing sequence of digits and recall it back correctly." },
+  rvlab: { title: "Remote Viewing Lab | Mind Interpreter", description: "Practice remote viewing with a freehand sketch, session notes, and a hidden target reveal, exploring anomalous perception and parapsychology." },
+  contact: { title: "Private Consultation | Benjamin Mithra, Mind Interpreter", description: "Book a private one to one consultation with Benjamin Mithra covering habit change, hypnosis, mindfulness, cognitive performance, and parapsychology, $110 USD per session." },
+  privacy: { title: "Privacy Policy | Mind Interpreter", description: "How this site handles data: no accounts, no tracking, and what actually happens with the Write to Me form." },
+  terms: { title: "Terms | Mind Interpreter", description: "Terms for using this site's games, exercises, and remote viewing content." },
+  disclaimer: { title: "Disclaimer | Mind Interpreter", description: "This site is educational and experimental, and is not a substitute for medical, psychiatric, or licensed psychological care." },
 };
 
 function useDocumentMeta(key) {

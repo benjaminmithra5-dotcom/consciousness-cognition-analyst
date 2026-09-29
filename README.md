@@ -1,4 +1,4 @@
-# Consciousness and Cognition Analyst
+# Mind Interpreter
 
 This is the source code for the website, built with React and Vite.
 
