@@ -800,7 +800,7 @@ function getContrastText(hex) {
   return luminance > 0.42 ? "#1B140D" : "#F3ECDD";
 }
 
-function WriteToMeForm({ style }) {
+function WriteToMeForm({ style, id }) {
   const c = useColors();
   const [wtmName, setWtmName] = useState("");
   const [wtmEmail, setWtmEmail] = useState("");
@@ -833,7 +833,7 @@ function WriteToMeForm({ style }) {
   };
 
   return (
-    <div style={{ ...styles(c).writeToMeWrap, ...style }}>
+    <div id={id} style={{ ...styles(c).writeToMeWrap, ...style }}>
       <p style={styles(c).contactSubhead}>Write to Me</p>
 
       <div style={styles(c).writeToMeField}>
@@ -896,7 +896,7 @@ function HomeScreen({ onNavigate, onOpenExercise }) {
           <p key={qIndex} className="fade-in" style={styles(c).homeQuestion}>{question}</p>
         </div>
 
-        <WriteToMeForm />
+        <WriteToMeForm id="write-to-me" />
 
         <p style={styles(c).homePhilosophy}>{PHILOSOPHY_TEXT}</p>
 
@@ -3238,6 +3238,259 @@ function ContactScreen({ onNavigate }) {
 }
 
 // =================================================================
+// Guide dog: a calm basset hound that lies in the bottom-left corner,
+// takes an occasional slow sniffing walk, and offers a tip for the
+// current page when tapped. Mounted only in a real browser after
+// load, so it never ends up in the prerendered HTML. Hiding it is kept
+// in memory only (the site stores nothing), so it lasts until reload.
+// =================================================================
+const GUIDE_DOG_TIPS = {
+  home: { text: "New here? You can just write to me, no need to prepare anything.", link: { href: "#write-to-me", label: "Go to the form" } },
+  contact: { text: "Take your time. Reach out whenever you're ready." },
+  exercises: { text: "Try the breathing exercise if you need a calm minute.", link: { to: "/exercises/breathing", label: "Open the breathing exercise" } },
+  games: { text: "Sniffing out a challenge? Chess is my favourite.", link: { to: "/games/chess", label: "Play chess" } },
+  rvlab: { text: "Do your session on paper first, then come back here." },
+  journals: { text: "New writing is on its way." },
+  other: { text: "Want to talk? I'll show you the way.", link: { to: "/consultation", label: "Go to Consultation" } },
+};
+const GUIDE_DOG_WALK_SPEED = 18; // px per second, a slow amble
+
+const GUIDE_DOG_CSS = `
+  .gd-wrap { position: fixed; left: 10px; bottom: 6px; z-index: 30; pointer-events: none; }
+  .gd-btn { pointer-events: auto; display: block; background: transparent; border: 0; padding: 4px; margin: 0; cursor: pointer; line-height: 0; border-radius: 10px; -webkit-tap-highlight-color: transparent; }
+  .gd-btn:focus { outline: none; }
+  .gd-btn:focus-visible, .gd-paw:focus-visible, .gd-hide:focus-visible, .gd-link:focus-visible { outline: 2px solid ${COLORS.gold}; outline-offset: 2px; }
+  .gd-svg { width: 90px; height: auto; display: block; overflow: visible; }
+  .gd-bubble {
+    pointer-events: auto; position: absolute; left: 4px; bottom: calc(100% + 10px);
+    width: max-content; max-width: min(250px, calc(100vw - 40px)); box-sizing: border-box;
+    background: ${COLORS.secondary}; border: 1px solid ${COLORS.strongLine}; border-radius: 12px;
+    padding: 12px 14px 10px; box-shadow: 0 12px 30px rgba(0,0,0,0.5); text-align: left;
+    display: flex; flex-direction: column; gap: 8px; animation: fadeIn 0.25s ease both;
+  }
+  .gd-bubble::after {
+    content: ""; position: absolute; left: 34px; bottom: -7px; width: 12px; height: 12px;
+    background: ${COLORS.secondary}; border-right: 1px solid ${COLORS.strongLine}; border-bottom: 1px solid ${COLORS.strongLine};
+    transform: rotate(45deg);
+  }
+  .gd-tip { font-family: 'Source Serif 4', Georgia, serif; font-size: 14.5px; line-height: 1.5; color: ${COLORS.ink}; margin: 0; }
+  .gd-link { font-family: 'Source Serif 4', Georgia, serif; font-size: 14px; color: ${COLORS.gold}; text-decoration: underline; text-underline-offset: 3px; }
+  .gd-hide { align-self: flex-start; font-family: 'Space Mono', monospace; font-size: 11px; color: ${COLORS.muted}; background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+  .gd-paw {
+    position: fixed; left: 12px; bottom: 10px; z-index: 30; width: 34px; height: 34px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer;
+    background: ${COLORS.secondary}; border: 1px solid ${COLORS.strongLine}; opacity: 0.8;
+  }
+  .gd-paw:hover { opacity: 1; }
+  .gd-part { transform-box: fill-box; }
+  .gd-breathe { transform-origin: 50% 100%; animation: gdBreathe 4.8s ease-in-out infinite; }
+  .gd-tail { transform-origin: 100% 100%; animation: gdWag 9s ease-in-out infinite; }
+  .gd-ear { transform-origin: 50% 0%; animation: gdEar 13s ease-in-out infinite; }
+  .gd-bob { animation: gdBob 0.9s ease-in-out infinite; }
+  .gd-leg { transform-origin: 30% 0%; animation: gdStep 0.9s ease-in-out infinite; }
+  .gd-leg-b { animation-delay: -0.45s; }
+  .gd-sniff { transform-origin: 0% 0%; animation: gdSniff 1.2s ease-in-out infinite; }
+  @keyframes gdBreathe { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.035); } }
+  @keyframes gdWag { 0%, 14%, 100% { transform: rotate(0deg); } 3% { transform: rotate(-9deg); } 6.5% { transform: rotate(5deg); } 10% { transform: rotate(-6deg); } }
+  @keyframes gdEar { 0%, 60%, 68%, 100% { transform: rotate(0deg); } 63% { transform: rotate(-7deg); } 65.5% { transform: rotate(2deg); } }
+  @keyframes gdBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-0.8px); } }
+  @keyframes gdStep { 0%, 100% { transform: rotate(9deg); } 50% { transform: rotate(-9deg); } }
+  @keyframes gdSniff { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(4deg); } }
+  @media (max-width: 600px) { .gd-svg { width: 70px; } }
+  @media (prefers-reduced-motion: reduce) {
+    .gd-wrap, .gd-wrap * { animation: none !important; transition: none !important; }
+  }
+`;
+
+// Original flat line drawing, side view facing right, in the logo's
+// gold-outline style. "lie": resting with head on paws. "walk": nose
+// down, sniffing along.
+function BassetSvg({ pose, facing }) {
+  const gold = COLORS.gold;
+  const common = { fill: COLORS.bg, stroke: gold, strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round" };
+  return (
+    <svg className="gd-svg" viewBox="0 0 120 56" aria-hidden="true" focusable="false" style={facing < 0 ? { transform: "scaleX(-1)" } : undefined}>
+      {pose === "walk" ? (
+        <g {...common}>
+          <path className="gd-part gd-tail" fill="none" d="M21 24 C14 18 12 11 13 4" />
+          <path className="gd-part gd-leg" d="M25 33 V48 Q25 51 29 51 H32" fill="none" />
+          <path className="gd-part gd-leg gd-leg-b" d="M33 33 V48 Q33 51 37 51 H40" fill="none" />
+          <path className="gd-part gd-leg gd-leg-b" d="M75 33 V48 Q75 51 79 51 H82" fill="none" />
+          <path className="gd-part gd-leg" d="M82 33 V48 Q82 51 86 51 H89" fill="none" />
+          <g className="gd-bob">
+            <path d="M24 38 C16 38 14 28 20 23 C26 18 42 18 58 19 C72 20 82 20 87 25 C90 29 89 36 84 38 Z" />
+            <path fill="none" strokeWidth="1.3" d="M38 19.5 C40 25 48 28 58 27 C66 26 70 23 72 20" />
+            <g className="gd-part gd-sniff">
+              <path d="M84 27 C84 20 91 18 97 21 C101 23 104 27 107 32 L111 39 C113 43 112 47 108 47 C107 50 103 50 100 48 L95 45 C88 41 84 35 84 27 Z" />
+              <circle cx="110" cy="44" r="2.2" fill={gold} />
+              <path fill="none" strokeWidth="1.2" d="M92 22.5 Q95 21.5 98 22.8" />
+              <circle cx="97" cy="28" r="1.2" fill={gold} stroke="none" />
+              <path fill="none" strokeWidth="1.3" d="M94 26.5 Q97 25.3 100 26.8" />
+              <path fill="none" strokeWidth="1.2" d="M94.5 29.5 Q97 32 99.5 29.8" />
+              <path className="gd-part gd-ear" fill={gold} fillOpacity="0.3" d="M89 24 C85 28 83 35 84 42 C84 48 86 52 90 52 C94 53 96 49 95 44 C94 37 94 30 93 25 Z" />
+            </g>
+          </g>
+        </g>
+      ) : (
+        <g {...common}>
+          <path className="gd-part gd-tail" fill="none" d="M20 34 C12 30 7 23 5 14" />
+          <ellipse cx="26" cy="50" rx="7" ry="2.6" />
+          <path d="M80 44 L99 47.5 C104 48 105 52 101 52 L80 52 Z" />
+          <path className="gd-part gd-breathe" d="M22 50 C14 50 12 40 18 33 C24 26 40 25 56 26 C70 27 81 27 87 32 C91 36 91 46 87 50 Z" />
+          <path fill="none" strokeWidth="1.6" d="M34 34 C27 36 25 45 30 50" />
+          <path fill="none" strokeWidth="1.3" d="M38 27.5 C40 33 48 36 58 35 C66 34 70 31 72 27.6" />
+          <path fill="none" strokeWidth="1.1" d="M97.5 48.5 V51.5 M100.5 48.8 V51.5" />
+          <path d="M86 30 C86 22 94 19 101 22 C105 24 108 27 112 30 L115 32 C118 34 118 39 115 41 C113 43 110 43 108 43 C107 47 103 48 99 47 L92 46 C87 44 85 38 86 30 Z" />
+          <circle cx="115" cy="35.5" r="2.2" fill={gold} />
+          <path fill="none" strokeWidth="1.2" d="M95 25.5 Q98 24.5 101 25.5" />
+          <circle cx="100" cy="30.5" r="1.2" fill={gold} stroke="none" />
+          <path fill="none" strokeWidth="1.3" d="M97 29 Q100 27.8 103 29.3" />
+          <path fill="none" strokeWidth="1.2" d="M97.5 32 Q100 34.5 102.5 32.2" />
+          <path className="gd-part gd-ear" fill={gold} fillOpacity="0.3" d="M91 25 C87 28 85 34 85 41 C85 47 86 52 90 53 C94 54 97 51 96 45 C95 38 95 31 94 26 Z" />
+        </g>
+      )}
+    </svg>
+  );
+}
+
+function PawIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill={COLORS.gold}>
+      <ellipse cx="12" cy="16" rx="5" ry="4.2" />
+      <ellipse cx="5.2" cy="10.5" rx="2.1" ry="2.7" />
+      <ellipse cx="9.4" cy="6.2" rx="2.1" ry="2.8" />
+      <ellipse cx="14.6" cy="6.2" rx="2.1" ry="2.8" />
+      <ellipse cx="18.8" cy="10.5" rx="2.1" ry="2.7" />
+    </svg>
+  );
+}
+
+function GuideDog({ view }) {
+  const location = useLocation();
+  const [ready, setReady] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [walk, setWalk] = useState({ x: 0, duration: 0, facing: 1, walking: false });
+  const wrapRef = useRef(null);
+  const walkEndRef = useRef(null);
+
+  // Only in a real browser, after load. Headless Chromium (the prerender
+  // step) reports navigator.webdriver, so the dog stays out of the HTML.
+  useEffect(() => {
+    if (navigator.webdriver) return;
+    const show = () => setReady(true);
+    if (document.readyState === "complete") { show(); return; }
+    window.addEventListener("load", show);
+    return () => window.removeEventListener("load", show);
+  }, []);
+
+  useEffect(() => {
+    const mq = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : null;
+    if (!mq) return;
+    const update = () => setReducedMotion(mq.matches);
+    update();
+    mq.addEventListener?.("change", update);
+    return () => mq.removeEventListener?.("change", update);
+  }, []);
+
+  useEffect(() => { setOpen(false); }, [location.pathname]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e) => { if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false); };
+    document.addEventListener("pointerdown", onDown);
+    return () => document.removeEventListener("pointerdown", onDown);
+  }, [open]);
+
+  useEffect(() => () => clearTimeout(walkEndRef.current), []);
+
+  // Every 20 to 40 seconds, maybe get up and sniff a short way along
+  // the bottom edge, then lie down again.
+  useEffect(() => {
+    if (!ready || hidden || open || reducedMotion || walk.walking) return;
+    const t = setTimeout(() => {
+      const maxX = Math.max(0, Math.min(220, window.innerWidth - 280));
+      if (maxX < 40 || Math.random() < 0.3) { setWalk((w) => ({ ...w })); return; }
+      const from = walk.x;
+      let to = from < 20 ? maxX * (0.45 + Math.random() * 0.55) : Math.random() < 0.6 ? 0 : Math.random() * maxX;
+      if (Math.abs(to - from) < 30) to = from < maxX / 2 ? maxX : 0;
+      const duration = Math.abs(to - from) / GUIDE_DOG_WALK_SPEED;
+      setWalk({ x: to, duration, facing: to > from ? 1 : -1, walking: true });
+      walkEndRef.current = setTimeout(() => setWalk((w) => ({ ...w, duration: 0, walking: false })), duration * 1000);
+    }, 20000 + Math.random() * 20000);
+    return () => clearTimeout(t);
+  }, [ready, hidden, open, reducedMotion, walk]);
+
+  if (!ready) return null;
+
+  const onDogClick = () => {
+    if (walk.walking) {
+      // Stop where it is so the bubble doesn't drift away.
+      clearTimeout(walkEndRef.current);
+      let x = walk.x;
+      try { x = new DOMMatrixReadOnly(getComputedStyle(wrapRef.current).transform).m41; } catch (e) {}
+      setWalk((w) => ({ ...w, x, duration: 0, walking: false }));
+    }
+    setOpen((o) => !o);
+  };
+
+  const hideDog = () => { setHidden(true); setOpen(false); };
+  const showDog = () => setHidden(false);
+
+  const tip = GUIDE_DOG_TIPS[view] || GUIDE_DOG_TIPS.other;
+  const link = tip.link && tip.link.to !== location.pathname ? tip.link : null;
+  const goToForm = (e) => {
+    const el = document.getElementById("write-to-me");
+    if (!el) return;
+    e.preventDefault();
+    el.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
+    setOpen(false);
+  };
+
+  return (
+    <>
+      <style>{GUIDE_DOG_CSS}</style>
+      {/* Keeps the end of every page clear of the dog. */}
+      <div aria-hidden="true" style={{ height: 56, flexShrink: 0 }} />
+      {hidden ? (
+        <button type="button" className="gd-paw" onClick={showDog} aria-label="Bring back the guide dog">
+          <PawIcon />
+        </button>
+      ) : (
+        <div
+          ref={wrapRef}
+          className="gd-wrap"
+          style={{ transform: `translateX(${walk.x}px)`, transition: walk.duration ? `transform ${walk.duration}s linear` : "none" }}
+        >
+          {open && (
+            <div className="gd-bubble" id="gd-tip">
+              <p className="gd-tip">{tip.text}</p>
+              {link && (link.href ? (
+                <a className="gd-link" href={link.href} onClick={goToForm}>{link.label}</a>
+              ) : (
+                <Link className="gd-link" to={link.to} onClick={() => setOpen(false)}>{link.label}</Link>
+              ))}
+              <button type="button" className="gd-hide" onClick={hideDog}>Hide the dog</button>
+            </div>
+          )}
+          <button
+            type="button"
+            className="gd-btn"
+            aria-label="Guide dog, tap for a tip"
+            aria-expanded={open}
+            aria-controls={open ? "gd-tip" : undefined}
+            onClick={onDogClick}
+          >
+            <BassetSvg pose={walk.walking ? "walk" : "lie"} facing={walk.facing} />
+          </button>
+        </div>
+      )}
+    </>
+  );
+}
+
+// =================================================================
 // App
 // =================================================================
 function pickRandomGame(excludeSet) { const remaining = GAMES.filter((g) => !excludeSet.has(g.key)); return remaining[randInt(0, remaining.length - 1)].key; }
@@ -3589,6 +3842,8 @@ export default function App() {
             </div>
           )}
         </main>
+
+        <GuideDog view={view} />
       </div>
     </ThemeContext.Provider>
   );
