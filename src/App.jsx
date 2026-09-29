@@ -3164,10 +3164,13 @@ function ContactScreen({ onNavigate }) {
       <div style={styles(c).contactCard}>
         <p ref={headingRef} style={styles(c).contactBigHeading}>Private Consultation</p>
 
-        <div style={styles(c).contactBubbleStack}>
-          {CONTACT_INTRO_BUBBLES.map((b, i) => (
-            <span key={i} style={{ ...styles(c).contactBubble, animationDelay: `${(i * 0.4).toFixed(2)}s` }}>{b}</span>
-          ))}
+        <div style={styles(c).contactIntroRow}>
+          <img src="/benjamin-mithra.jpg" alt="Benjamin Mithra" width="360" height="360" style={styles(c).contactPortrait} />
+          <div style={styles(c).contactBubbleStack}>
+            {CONTACT_INTRO_BUBBLES.map((b, i) => (
+              <span key={i} style={{ ...styles(c).contactBubble, animationDelay: `${(i * 0.4).toFixed(2)}s` }}>{b}</span>
+            ))}
+          </div>
         </div>
 
         <div style={styles(c).contactDivider} />
@@ -3850,6 +3853,12 @@ function styles(c) {
     },
     writeToMeError: { fontFamily: font.display, fontWeight: 500, fontSize: 13.5, color: c.bad, margin: 0 },
     writeToMeSuccess: { fontFamily: font.display, fontWeight: 500, fontSize: 13.5, color: c.good, margin: 0 },
+    contactIntroRow: { display: "flex", flexWrap: "wrap", alignItems: "center", gap: 20 },
+    contactPortrait: {
+      width: "clamp(104px, 28vw, 132px)", height: "auto", aspectRatio: "1 / 1", objectFit: "cover", borderRadius: "50%",
+      border: `2px solid ${c.gold}`, padding: 3, background: c.secondary, flexShrink: 0, display: "block",
+      boxShadow: "0 10px 26px rgba(0,0,0,0.45)",
+    },
     contactBubbleStack: { display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 10 },
     contactBubble: {
       fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: c.ink, background: "rgba(255,255,255,0.05)",
