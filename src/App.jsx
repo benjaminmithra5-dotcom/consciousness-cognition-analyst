@@ -3137,6 +3137,15 @@ const WHATSAPP_NUMBER = "447440573315";
 const EMAIL_ADDRESS = "benjaminmithra@gmail.com";
 const FORMSPREE_ENDPOINT = "https://formspree.io/f/xjyvqwrd";
 const CONTACT_INTRO_BUBBLES = ["Hi, I'm Benjamin Mithra.", "I'm a Mind Interpreter.", "You talk. I listen. We explore."];
+const CONTACT_STEPS = [
+  { title: "Reach out.", text: "Send me a message on WhatsApp, by email, or through the Write to Me form. You don't need to explain everything; a few words are enough." },
+  { title: "Choose a time.", text: "We'll find a time that suits you. I'm based in India, so just tell me your time zone and I'll work around it." },
+  { title: "We talk.", text: "Sessions are 60 minutes, by video or voice call. You can keep your camera off if you prefer. There's no agenda, and nothing you need to prepare." },
+];
+const CONTACT_NOT_PARAGRAPHS = [
+  "These conversations are a space to talk, reflect and understand. They aren't therapy, counselling, or medical or psychological treatment, and I don't diagnose or treat any condition. If you're working with a doctor or therapist, this can sit alongside that, but it isn't a replacement for it.",
+  "If you're in crisis or thinking about harming yourself, please don't wait for a session. Contact your local emergency services or a crisis line right away (for example, 988 in the US).",
+];
 const CONTACT_INTRO_PARAGRAPHS = [
   "Sometimes you simply need someone who will listen without rushing to judge, advise, or tell you what to do.",
   "You can bring whatever is on your mind. Something you're going through, a difficult decision, a recurring thought or pattern, an experience you don't understand, or simply something you've never had the space to talk about.",
@@ -3180,6 +3189,25 @@ function ContactScreen({ onNavigate }) {
           <p key={i} style={styles(c).contactBody}>{t}</p>
         ))}
         <p style={styles(c).contactClosing}>This is a private space for conversation, reflection and understanding.</p>
+
+        <div style={styles(c).contactDivider} />
+
+        <p style={styles(c).contactSubhead}>How it works</p>
+        <ol style={styles(c).contactSteps}>
+          {CONTACT_STEPS.map((step, i) => (
+            <li key={i} style={styles(c).contactBody}>
+              <strong style={styles(c).contactStepTitle}>{step.title}</strong> {step.text}
+            </li>
+          ))}
+        </ol>
+        <p style={styles(c).contactBody}>What you share stays private and is never shared with anyone.</p>
+
+        <div style={styles(c).contactDivider} />
+
+        <p style={styles(c).contactSubhead}>What this isn't</p>
+        {CONTACT_NOT_PARAGRAPHS.map((t, i) => (
+          <p key={i} style={styles(c).contactBody}>{t}</p>
+        ))}
 
         <div style={styles(c).contactDivider} />
 
@@ -3829,6 +3857,8 @@ function styles(c) {
     contactBigHeading: { fontFamily: font.display, fontWeight: 700, fontSize: 32, letterSpacing: "0.03em", textTransform: "uppercase", color: c.gold, margin: "0 0 10px", lineHeight: 1.3 },
     contactBody: { fontSize: 14.5, lineHeight: 1.75, color: c.muted, margin: 0 },
     contactDivider: { height: 1, background: `linear-gradient(90deg, ${c.line} 0%, transparent 90%)`, width: "100%", margin: "2px 0" },
+    contactSteps: { margin: 0, paddingLeft: 22, display: "flex", flexDirection: "column", gap: 10, color: c.muted },
+    contactStepTitle: { color: c.ink, fontWeight: 600 },
     contactClosing: { fontFamily: font.body, fontStyle: "italic", fontSize: 15.5, lineHeight: 1.7, color: c.ink, margin: "6px 0 0" },
     contactSubhead: { fontFamily: font.display, fontSize: 19, letterSpacing: "0.06em", textTransform: "uppercase", color: c.gold, margin: "8px 0 6px" },
 
