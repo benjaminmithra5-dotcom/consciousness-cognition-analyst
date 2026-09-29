@@ -3238,8 +3238,9 @@ function ContactScreen({ onNavigate }) {
 }
 
 // =================================================================
-// Guide dog: a calm Great Dane that lies in the bottom-left corner,
-// takes an occasional slow walk, and offers a tip for the
+// Guide dog: a calm Great Dane that rests in the doorway of its house
+// in the bottom-left corner, takes an occasional slow walk out and
+// back, and offers a tip for the
 // current page when tapped. Mounted only in a real browser after
 // load, so it never ends up in the prerendered HTML. Hiding it is kept
 // in memory only (the site stores nothing), so it lasts until reload.
@@ -3254,6 +3255,7 @@ const GUIDE_DOG_TIPS = {
   other: { text: "Want to talk? I'll show you the way.", link: { to: "/consultation", label: "Go to Consultation" } },
 };
 const GUIDE_DOG_WALK_SPEED = 18; // px per second, a slow amble
+const GUIDE_DOG_HOME = { x: 0, duration: 0, facing: 1, phase: "home" };
 
 const GUIDE_DOG_CSS = `
   .gd-wrap { position: fixed; left: 10px; bottom: 6px; z-index: 30; pointer-events: none; }
@@ -3261,6 +3263,10 @@ const GUIDE_DOG_CSS = `
   .gd-btn:focus { outline: none; }
   .gd-btn:focus-visible, .gd-paw:focus-visible, .gd-hide:focus-visible, .gd-link:focus-visible { outline: 2px solid ${COLORS.gold}; outline-offset: 2px; }
   .gd-svg { width: 110px; height: auto; display: block; overflow: visible; }
+  .gd-house { position: fixed; left: 14px; bottom: 10px; pointer-events: none; line-height: 0; }
+  .gd-house-back { z-index: 29; }
+  .gd-house-front { z-index: 31; }
+  .gd-house .gd-svg path { pointer-events: visiblePainted; cursor: pointer; }
   .gd-bubble {
     pointer-events: auto; position: absolute; left: 4px; bottom: calc(100% + 10px);
     width: max-content; max-width: min(250px, calc(100vw - 40px)); box-sizing: border-box;
@@ -3269,7 +3275,7 @@ const GUIDE_DOG_CSS = `
     display: flex; flex-direction: column; gap: 8px; animation: fadeIn 0.25s ease both;
   }
   .gd-bubble::after {
-    content: ""; position: absolute; left: 34px; bottom: -7px; width: 12px; height: 12px;
+    content: ""; position: absolute; left: 72px; bottom: -7px; width: 12px; height: 12px;
     background: ${COLORS.secondary}; border-right: 1px solid ${COLORS.strongLine}; border-bottom: 1px solid ${COLORS.strongLine};
     transform: rotate(45deg);
   }
@@ -3289,6 +3295,9 @@ const GUIDE_DOG_CSS = `
   .gd-bob { animation: gdBob 0.9s ease-in-out infinite; }
   .gd-leg { transform-origin: 50% 0%; animation: gdStep 0.9s ease-in-out infinite; }
   .gd-leg-b { animation-delay: -0.45s; }
+  .gd-still .gd-leg, .gd-still .gd-bob { animation: none; }
+  .gd-at-home .gd-tail { visibility: hidden; }
+  .gd-house.gd-inflow, .gd-wrap.gd-inflow, .gd-paw.gd-inflow { position: absolute; }
   @keyframes gdBreathe { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.035); } }
   @keyframes gdWag { 0%, 14%, 100% { transform: rotate(0deg); } 3% { transform: rotate(-9deg); } 6.5% { transform: rotate(5deg); } 10% { transform: rotate(-6deg); } }
   @keyframes gdEar { 0%, 60%, 68%, 100% { transform: rotate(0deg); } 63% { transform: rotate(-7deg); } 65.5% { transform: rotate(2deg); } }
@@ -3303,13 +3312,14 @@ const GUIDE_DOG_CSS = `
 // Original Great Dane silhouette in solid gold, side view facing
 // right, with a few dark cut-out details (eye, mouth, ear edge,
 // collar). "lie": sphinx pose, head up. "walk": standing, head level.
+// "stand": the walking pose held still.
 function GreatDaneSvg({ pose, facing }) {
   const gold = COLORS.gold;
   const dark = COLORS.bg;
   const earFill = COLORS.goldDark;
   const flip = facing < 0 ? { transform: "scaleX(-1)" } : undefined;
-  return pose === "walk" ? (
-    <svg className="gd-svg" viewBox="0 0 124 100" aria-hidden="true" focusable="false" style={flip}>
+  return pose !== "lie" ? (
+    <svg className={pose === "stand" ? "gd-svg gd-still" : "gd-svg"} viewBox="0 0 124 100" aria-hidden="true" focusable="false" style={flip}>
       <g fill={gold}>
         <path className="gd-part gd-leg gd-leg-b" d="M36 44 C44 44 50 52 48 62 L43 78 L43 95 L47 96 C48 96.5 48 98 47 98 L37 98 L37 81 C32 74 29 60 36 44 Z" opacity="0.7" />
         <path className="gd-part gd-leg gd-leg-b" d="M76 54 L83 54 L83 95 L87 96 C88 96.5 88 98 87 98 L76 98 Z" opacity="0.7" />
@@ -3351,6 +3361,45 @@ function GreatDaneSvg({ pose, facing }) {
   );
 }
 
+// The dog's house, drawn in the same coordinates as the lying dog so
+// the dog rests in its doorway. It's split into two layers around the
+// dog: "back" is the whole house plus the dark interior, "front" is
+// only the part left of where the dog comes out (x < 74), with the
+// doorway cut out, so it hides the dog's back half inside the house.
+const GUIDE_DOG_HOUSE_FRONT_EDGE = 74;
+function DogHouseSvg({ layer }) {
+  const gold = COLORS.gold;
+  const door = "M50 62 V44 A15 15 0 0 1 80 44 V62 Z";
+  const house = (
+    <g stroke={gold} strokeWidth="1.4" strokeLinejoin="round">
+      <path d="M0 18 H40 V62 H0 Z" fill={COLORS.secondary} />
+      <path fill="none" stroke={COLORS.goldDark} strokeWidth="0.8" strokeOpacity="0.6" d="M2 29 H38 M2 40 H38 M2 51 H38" />
+      <path d="M22 -6 H66 L38 19 H-6 Z" fill={COLORS.secondary} />
+      <path d={`M40 18 L66 -3 L92 18 V62 H40 Z ${door}`} fillRule="evenodd" fill={COLORS.surface} />
+      <path fill="none" strokeWidth="3" strokeLinecap="round" d="M36 20.5 L66 -3.5 L96 20.5" />
+    </g>
+  );
+  return (
+    <svg className="gd-svg" viewBox="0 0 124 64" aria-hidden="true" focusable="false">
+      {layer === "front" ? (
+        <>
+          <defs>
+            <clipPath id="gd-house-front-clip">
+              <rect x="-20" y="-20" width={20 + GUIDE_DOG_HOUSE_FRONT_EDGE} height="100" />
+            </clipPath>
+          </defs>
+          <g clipPath="url(#gd-house-front-clip)">{house}</g>
+        </>
+      ) : (
+        <>
+          <path d={door} fill={COLORS.playfield} />
+          {house}
+        </>
+      )}
+    </svg>
+  );
+}
+
 function PawIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill={COLORS.gold}>
@@ -3369,9 +3418,11 @@ function GuideDog({ view }) {
   const [hidden, setHidden] = useState(false);
   const [open, setOpen] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
-  const [walk, setWalk] = useState({ x: 0, duration: 0, facing: 1, walking: false });
+  // phase: "home" (resting in the doorway), "out" (walking out),
+  // "sniff" (a pause at the far point), "back" (walking home), or
+  // "paused" (stopped mid-walk while its tip is open).
+  const [walk, setWalk] = useState(GUIDE_DOG_HOME);
   const wrapRef = useRef(null);
-  const walkEndRef = useRef(null);
 
   // Only in a real browser, after load. Headless Chromium (the prerender
   // step) reports navigator.webdriver, so the dog stays out of the HTML.
@@ -3396,43 +3447,84 @@ function GuideDog({ view }) {
 
   useEffect(() => {
     if (!open) return;
-    const onDown = (e) => { if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false); };
+    const onDown = (e) => {
+      if (wrapRef.current && wrapRef.current.contains(e.target)) return;
+      if (e.target.closest && e.target.closest(".gd-house")) return;
+      setOpen(false);
+    };
     document.addEventListener("pointerdown", onDown);
     return () => document.removeEventListener("pointerdown", onDown);
   }, [open]);
 
-  useEffect(() => () => clearTimeout(walkEndRef.current), []);
-
-  // Every 20 to 40 seconds, maybe get up and walk a short way along
-  // the bottom edge, then lie down again.
+  // Where there's a clear left margin beside the page content, the dog
+  // and its house float in the bottom-left corner and walk only within
+  // that margin. Where there isn't (phones, narrow windows), they sit
+  // in the reserved strip at the very bottom of the page instead, so
+  // they never cover content.
+  const [inFlow, setInFlow] = useState(false);
+  const [maxWalk, setMaxWalk] = useState(0);
   useEffect(() => {
-    if (!ready || hidden || open || reducedMotion || walk.walking) return;
+    if (!ready) return;
+    const measure = () => {
+      const vw = window.innerWidth;
+      const main = document.querySelector("main");
+      let colLeft = vw;
+      if (main) {
+        for (const el of main.querySelectorAll("*")) {
+          const r = el.getBoundingClientRect();
+          if (r.width > 0 && r.height > 0 && r.width < vw * 0.9 && r.left < colLeft) colLeft = r.left;
+        }
+      }
+      const dogWidth = vw <= 600 ? 85 : 110;
+      const docked = colLeft >= 14 + dogWidth + 16;
+      setInFlow(!docked);
+      setMaxWalk(docked ? Math.min(220, colLeft - 14 - dogWidth - 16) : Math.min(220, vw - 280));
+    };
+    const raf = requestAnimationFrame(measure);
+    window.addEventListener("resize", measure);
+    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", measure); };
+  }, [ready, location.pathname]);
+
+  // Reduced motion or hiding sends it straight home.
+  useEffect(() => { if (reducedMotion || hidden) setWalk(GUIDE_DOG_HOME); }, [reducedMotion, hidden]);
+
+  // Every 20 to 40 seconds, maybe get up, step out of the house and
+  // walk a short way along the bottom edge.
+  useEffect(() => {
+    if (!ready || hidden || open || reducedMotion || walk.phase !== "home") return;
     const t = setTimeout(() => {
-      const maxX = Math.max(0, Math.min(220, window.innerWidth - 280));
-      if (maxX < 40 || Math.random() < 0.3) { setWalk((w) => ({ ...w })); return; }
-      const from = walk.x;
-      let to = from < 20 ? maxX * (0.45 + Math.random() * 0.55) : Math.random() < 0.6 ? 0 : Math.random() * maxX;
-      if (Math.abs(to - from) < 30) to = from < maxX / 2 ? maxX : 0;
-      const duration = Math.abs(to - from) / GUIDE_DOG_WALK_SPEED;
-      setWalk({ x: to, duration, facing: to > from ? 1 : -1, walking: true });
-      walkEndRef.current = setTimeout(() => setWalk((w) => ({ ...w, duration: 0, walking: false })), duration * 1000);
+      if (maxWalk < 60 || Math.random() < 0.3) { setWalk((w) => ({ ...w })); return; }
+      const to = maxWalk * (0.5 + Math.random() * 0.5);
+      setWalk({ x: to, duration: to / GUIDE_DOG_WALK_SPEED, facing: 1, phase: "out" });
     }, 20000 + Math.random() * 20000);
     return () => clearTimeout(t);
-  }, [ready, hidden, open, reducedMotion, walk]);
+  }, [ready, hidden, open, reducedMotion, walk, maxWalk]);
+
+  // Out, a short sniff, then back home to lie down in the doorway.
+  useEffect(() => {
+    let t;
+    const goHome = (w) => (w.x > 1 ? { x: 0, duration: w.x / GUIDE_DOG_WALK_SPEED, facing: -1, phase: "back" } : GUIDE_DOG_HOME);
+    if (walk.phase === "out") t = setTimeout(() => setWalk((w) => ({ ...w, duration: 0, phase: "sniff" })), walk.duration * 1000);
+    else if (walk.phase === "sniff") t = setTimeout(() => setWalk(goHome), 3000);
+    else if (walk.phase === "back") t = setTimeout(() => setWalk(GUIDE_DOG_HOME), walk.duration * 1000);
+    else if (walk.phase === "paused" && !open) setWalk(goHome);
+    return () => clearTimeout(t);
+  }, [walk.phase, open]);
 
   if (!ready) return null;
 
-  const onDogClick = () => {
-    if (walk.walking) {
-      // Stop where it is so the bubble doesn't drift away.
-      clearTimeout(walkEndRef.current);
+  const toggleTip = () => {
+    if (walk.phase !== "home" && walk.phase !== "paused") {
+      // Stop where it is so the bubble doesn't drift away; it heads
+      // home once the bubble closes.
       let x = walk.x;
       try { x = new DOMMatrixReadOnly(getComputedStyle(wrapRef.current).transform).m41; } catch (e) {}
-      setWalk((w) => ({ ...w, x, duration: 0, walking: false }));
+      setWalk((w) => ({ ...w, x, duration: 0, phase: "paused" }));
     }
     setOpen((o) => !o);
   };
 
+  const flowClass = inFlow ? " gd-inflow" : "";
   const hideDog = () => { setHidden(true); setOpen(false); };
   const showDog = () => setHidden(false);
 
@@ -3449,16 +3541,20 @@ function GuideDog({ view }) {
   return (
     <>
       <style>{GUIDE_DOG_CSS}</style>
-      {/* Keeps the end of every page clear of the dog. */}
-      <div aria-hidden="true" style={{ height: 56, flexShrink: 0 }} />
+      {/* Keeps the end of every page clear of the dog and its house. */}
+      <div aria-hidden="true" style={{ height: 76, flexShrink: 0 }} />
       {hidden ? (
-        <button type="button" className="gd-paw" onClick={showDog} aria-label="Bring back the guide dog">
+        <button type="button" className={`gd-paw${flowClass}`} onClick={showDog} aria-label="Bring back the guide dog">
           <PawIcon />
         </button>
       ) : (
+        <>
+        <div className={`gd-house gd-house-back${flowClass}`} onClick={toggleTip} aria-hidden="true">
+          <DogHouseSvg layer="back" />
+        </div>
         <div
           ref={wrapRef}
-          className="gd-wrap"
+          className={`gd-wrap${walk.phase === "home" ? " gd-at-home" : ""}${flowClass}`}
           style={{ transform: `translateX(${walk.x}px)`, transition: walk.duration ? `transform ${walk.duration}s linear` : "none" }}
         >
           {open && (
@@ -3478,11 +3574,18 @@ function GuideDog({ view }) {
             aria-label="Guide dog, tap for a tip"
             aria-expanded={open}
             aria-controls={open ? "gd-tip" : undefined}
-            onClick={onDogClick}
+            onClick={toggleTip}
           >
-            <GreatDaneSvg pose={walk.walking ? "walk" : "lie"} facing={walk.facing} />
+            <GreatDaneSvg
+              pose={walk.phase === "home" ? "lie" : walk.phase === "out" || walk.phase === "back" ? "walk" : "stand"}
+              facing={walk.facing}
+            />
           </button>
         </div>
+        <div className={`gd-house gd-house-front${flowClass}`} onClick={toggleTip} aria-hidden="true">
+          <DogHouseSvg layer="front" />
+        </div>
+        </>
       )}
     </>
   );
