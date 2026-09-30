@@ -3238,19 +3238,18 @@ function ContactScreen({ onNavigate }) {
 }
 
 // =================================================================
-// Guide dog: a calm Great Dane that lives in a house fixed to the
-// bottom-left corner of the screen. It rests in the doorway, and every
-// so often picks an activity (chasing a butterfly, following a scent,
-// keeping watch, sitting, stretching, or napping), then comes home.
-// Tapping the house or the resting dog shows a tip for the current
-// page. Mounted only in a real browser after load, so it never ends up
-// in the prerendered HTML. Hiding it is kept in memory only (the site
-// stores nothing), so it lasts until reload.
+// Guide dog: a calm Great Dane lying in the doorway of its house,
+// fixed to the bottom-left corner of the screen. It stays at home;
+// every so often it does something small from the doorway (watches a
+// butterfly, yawns, tilts its head, sniffs the air, or naps). Tapping
+// the house shows a tip for the current page. Mounted only in a real
+// browser after load, so it never ends up in the prerendered HTML.
+// Hiding it is kept in memory only (the site stores nothing), so it
+// lasts until reload.
 //
-// Everything is one SVG scene in "dog units" with the ground at y=62.
-// The house (and the space behind its roof line) hides any part of the
-// dog inside it, except what shows through the doorway, so the dog is always drawn
-// behind the house's front wall and never on top of it.
+// Everything is one SVG scene: a front-facing house on the ground at
+// y=100, and the dog, facing out, clipped to the doorway so it's
+// always behind the front wall.
 // =================================================================
 const GUIDE_DOG_TIPS = {
   home: { text: "New here? You can just write to me, no need to prepare anything.", link: { href: "#write-to-me", label: "Go to the form" } },
@@ -3262,135 +3261,78 @@ const GUIDE_DOG_TIPS = {
   other: { text: "Want to talk? I'll show you the way.", link: { to: "/consultation", label: "Go to Consultation" } },
 };
 
-const GD_REST_X = 29; // lying in the doorway: back half inside, head and paws out
-const GD_HIDDEN_X = -35; // standing, facing out, still fully inside the house
-const GD_INSIDE_X = -50; // how far in it walks (facing in) before turning around
-const GD_WALK = 22; // units per second: a slow walk
-const GD_TROT = 46; // a light trot, for the butterfly
-const GD_SCENE_TOP = -80;
-const GD_SCENE_BOTTOM = 64;
-const GD_DOOR = "M64 62 V22 A16 16 0 0 1 96 22 V62 Z";
-// Leg phases are fractions of a stride, in the order near hind, near
-// fore, far hind, far fore: a four-beat walk and a two-beat trot.
-const GD_GAITS = {
-  walk: { amp: 13, lift: 3, stride: 38, phase: [0, 0.25, 0.5, 0.75], bob: 1.2 },
-  trot: { amp: 18, lift: 5, stride: 52, phase: [0, 0.5, 0.5, 0], bob: 1.8 },
-};
+const GD_DOOR = "M22 100 V50 A28 28 0 0 1 78 50 V100 Z";
+const GD_VIEW = { x: -8, y: -90, w: 290, h: 196 }; // room above and right for the butterfly
+const GD_HOME_BOX = { x: -6, y: -2, w: 112, h: 110 }; // the house, for taps and the tip bubble
 const GD_CANCEL = { cancelled: true };
 const gdEase = (p) => (p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2);
-const gdEaseOut = (p) => 1 - (1 - p) * (1 - p);
-const gdEaseIn = (p) => p * p;
+const gdClamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
-// Drives the dog: tweens, walking with a real gait, blinking, and a
-// few timed helpers the activities are written with. All drawing is
-// done by setting attributes on the SVG nodes in `n`, once per frame.
-function createGuideDogEngine(n, getBounds, onHome) {
+// Drives the dog: eased tweens, breathing, blinking, ear twitches and
+// ears that settle a moment after the head moves. All drawing is done
+// by setting attributes on the SVG nodes in `n`, once per frame.
+function createGuideDogEngine(n) {
   const s = {
-    x: GD_REST_X, flip: 1, dist: 0, gait: "walk", legAmp: 0,
-    stand: 0, standY: 0, lie: 1, lieY: 0, sit: 0, sitY: 0,
-    neck: 0, tilt: 0, turn: 1, perk: 0, lieHead: 0, bow: 0, crouch: 0,
-    hop: 0, shake: 0, yawn: 0, wag: 0, sleep: 0, zzz: 0, bx: 0, by: 0, bOp: 0,
+    headRot: 0, headY: 0, look: 0, perk: 0, paw: 0, yawn: 0, sleep: 0, zzz: 0,
+    noseUp: 0, sniff: 0, earL: 0, earR: 0, follow: 0, bx: 260, by: -60, bOp: 0,
   };
   const tweens = [];
   const pending = new Set();
-  let walker = null;
   let raf = 0;
   let last = 0;
   let time = 0;
   let blinkIn = 3;
   let blinkT = -1;
+  let twitchIn = 6;
+  let lagRot = 0;
+  let lagVel = 0;
+  const trail = { look: 0, rot: 0, y: 0 }; // where the head is, while following the butterfly
   let dead = false;
 
   // Every wait resolves early when the engine is destroyed, and then
-  // throws GD_CANCEL so a running activity stops where it is.
+  // throws GD_CANCEL so a running action stops where it is.
   const promise = (start) =>
     new Promise((resolve) => {
       const done = () => { pending.delete(done); resolve(); };
       pending.add(done);
       start(done);
     }).then(() => { if (dead) throw GD_CANCEL; });
-
-  const tween = (key, to, ms, ease = gdEase) =>
+  const tween = (key, to, ms) =>
     promise((done) => {
       for (let i = tweens.length - 1; i >= 0; i--) {
         if (tweens[i].key === key) { tweens[i].done(); tweens.splice(i, 1); }
       }
-      tweens.push({ key, from: s[key], to, ms: Math.max(1, ms), t: 0, ease, done });
+      tweens.push({ key, from: s[key], to, ms: Math.max(1, ms), t: 0, done });
     });
-  const tweenAll = (values, ms, ease) => Promise.all(Object.entries(values).map(([k, v]) => tween(k, v, ms, ease)));
+  const tweenAll = (values, ms) => Promise.all(Object.entries(values).map(([k, v]) => tween(k, v, ms)));
   const wait = (ms) => promise((done) => setTimeout(done, ms));
-
-  // Turns to face the way it's going, then walks there.
-  const turn = async (dir) => { if (Math.sign(s.flip) !== dir) await tween("flip", dir, 500); };
-  const walkTo = async (x, speed = GD_WALK, gait = "walk") => {
-    const dir = Math.sign(x - s.x);
-    if (!dir) return;
-    await turn(dir);
-    s.gait = gait;
-    await promise((done) => { walker = { to: x, speed, done }; });
-  };
-
-  // Crossfades between the stand, sit and lie drawings while sinking or
-  // rising a little, so it reads as lying down, sitting or getting up.
-  const changePose = async (from, to, ms = 550) => {
-    s[to + "Y"] = to === "stand" ? 8 : -6;
-    // The new pose comes in first and the old one fades after, so the
-    // dog is never see-through all over.
-    await Promise.all([
-      tween(to, 1, ms * 0.5, gdEaseOut),
-      tween(to + "Y", 0, ms),
-      tween(from + "Y", from === "stand" ? 10 : 5, ms),
-      (async () => { await wait(ms * 0.35); await tween(from, 0, ms * 0.5, gdEaseIn); })(),
-    ]);
-    s[from + "Y"] = 0;
-  };
-  const hop = async () => { await tween("hop", 9, 230, gdEaseOut); await tween("hop", 0, 260, gdEaseIn); };
-  const wag = async (ms) => { await tween("wag", 1, 180); await wait(ms); await tween("wag", 0, 300); };
 
   function apply() {
     const T = (el, v) => el && el.setAttribute("transform", v);
-    const O = (el, v) => el && el.setAttribute("opacity", Math.max(0, Math.min(1, v)).toFixed(3));
-    const g = GD_GAITS[s.gait];
-    const wave = (ph) => 2 * Math.PI * (s.dist / g.stride + ph);
-    const bob = s.legAmp * g.bob * Math.sin(2 * wave(0));
-    const shake = s.shake * 6 * Math.sin(time * 2 * Math.PI * 4.5);
+    const O = (el, v) => el && el.setAttribute("opacity", gdClamp(v, 0, 1).toFixed(3));
+    const f = s.follow;
+    const look = s.look * (1 - f) + trail.look * f;
+    const rot = s.headRot * (1 - f) + trail.rot * f;
+    const lift = s.headY * (1 - f) + trail.y * f;
+    const breath = Math.sin((time * 2 * Math.PI) / 4.6);
+    const earLag = (lagRot - rot) * 0.9;
 
-    T(n.root, `translate(${s.x} 0)`);
-    T(n.flip, `translate(62 0) scale(${s.flip} 1) translate(-62 0)`);
-    T(n.hop, `translate(0 ${-s.hop}) rotate(${shake} 62 14)`);
-    O(n.stand, s.stand); T(n.stand, `translate(0 ${s.standY - 36})`);
-    O(n.sit, s.sit); T(n.sit, `translate(0 ${s.sitY - 36})`);
-    O(n.lie, s.lie); T(n.lie, `translate(0 ${s.lieY})`);
-
-    const legs = [[n.legNH, 33, 47], [n.legNF, 86.5, 56], [n.legFH, 40, 47], [n.legFF, 79.5, 56]];
-    legs.forEach(([el, px, py], i) => {
-      const w = wave(g.phase[i]);
-      const fore = i % 2 === 1;
-      const extra = fore ? -70 * s.bow - 16 * s.crouch : 0;
-      const a = s.legAmp * g.amp * Math.sin(w) + extra;
-      const lift = s.legAmp * g.lift * Math.max(0, -Math.cos(w));
-      T(el, `translate(0 ${-lift}) rotate(${a} ${px} ${py})`);
-    });
-    T(n.front, `translate(0 ${-0.4 * Math.abs(bob)}) rotate(${16 * s.bow + 5 * s.crouch} 32 44)`);
-    T(n.neck, `rotate(${s.neck + bob} 80 44)`);
-    T(n.head, `rotate(${s.tilt} 100 16) translate(100 0) scale(${s.turn} 1) translate(-100 0)`);
-    T(n.sitHead, `rotate(${s.tilt} 100 16)`);
-    const tail = s.legAmp * 7 * Math.sin(wave(0)) + s.wag * 16 * Math.sin(time * 2 * Math.PI * 2.6);
-    T(n.tail, `rotate(${tail} 24 42)`);
-    T(n.sitTail, `rotate(${s.wag * 10 * Math.sin(time * 2 * Math.PI * 2.6)} 26 94)`);
-    [n.ear, n.sitEar, n.lieEar].forEach((el) => T(el, `rotate(${-s.perk} 97 6)`));
-    T(n.lieHead, `rotate(${s.lieHead} 96 30)`);
-
-    const blink = blinkT >= 0 ? Math.sin((Math.PI * blinkT) / 0.18) : 0;
-    const open = Math.max(0.08, 1 - blink);
-    [n.eye, n.sitEye].forEach((el) => T(el, `translate(105 11) scale(1 ${open}) translate(-105 -11)`));
-    T(n.lieEye, `translate(105 11) scale(1 ${Math.max(0.05, open * (1 - s.sleep))}) translate(-105 -11)`);
-    O(n.lieEyeShut, s.sleep);
+    T(n.chest, `translate(50 100) scale(1 ${1 + 0.018 * breath}) translate(-50 -100)`);
+    T(n.head, `translate(0 ${lift + 0.35 * breath}) rotate(${rot} 50 66) translate(50 66) scale(1 ${1 - 0.05 * s.noseUp}) translate(-50 -66)`);
+    T(n.face, `translate(${look * 2.6} ${-2.2 * s.noseUp - 0.8 * s.sniff})`);
+    T(n.nose, `translate(50 53.5) scale(${1 + 0.08 * s.sniff}) translate(-50 -53.5)`);
+    T(n.earL, `rotate(${14 * s.perk + earLag + s.earL} 39.6 31.5)`);
+    T(n.earR, `rotate(${-14 * s.perk + earLag - s.earR} 60.4 31.5)`);
+    const blink = blinkT >= 0 ? Math.sin((Math.PI * blinkT) / 0.2) : 0;
+    const open = Math.max(0.06, (1 - blink) * (1 - s.sleep));
+    T(n.eyes, `translate(0 42) scale(1 ${open}) translate(0 -42)`);
+    O(n.eyesShut, s.sleep);
     O(n.mouth, s.yawn > 0.02 ? 1 : 0);
-    T(n.mouth, `translate(109 20) scale(1 ${Math.max(0.01, s.yawn)}) translate(-109 -20)`);
+    T(n.mouth, `translate(50 59) scale(1 ${Math.max(0.01, s.yawn)}) translate(-50 -59)`);
+    T(n.paw, `translate(${2 * s.paw} ${-9 * s.paw}) rotate(${-12 * s.paw} 35 81)`);
     O(n.zzz, s.zzz);
     O(n.bfly, s.bOp);
-    T(n.bfly, `translate(${s.bx + 4 * Math.sin(time * 2.3)} ${s.by + 6 * Math.sin(time * 3.7)}) rotate(${10 * Math.sin(time * 2.9)})`);
+    T(n.bfly, `translate(${s.bx + 5 * Math.sin(time * 1.9)} ${s.by + 7 * Math.sin(time * 2.7)}) rotate(${12 * Math.sin(time * 2.3)})`);
   }
 
   function frame(now) {
@@ -3401,335 +3343,200 @@ function createGuideDogEngine(n, getBounds, onHome) {
       const tw = tweens[i];
       tw.t += dt * 1000;
       const p = Math.min(1, tw.t / tw.ms);
-      s[tw.key] = tw.from + (tw.to - tw.from) * tw.ease(p);
+      s[tw.key] = tw.from + (tw.to - tw.from) * gdEase(p);
       if (p >= 1) { tweens.splice(i, 1); tw.done(); }
     }
-    if (walker) {
-      const left = walker.to - s.x;
-      const step = Math.min(Math.abs(left), walker.speed * dt);
-      s.x += Math.sign(left) * step;
-      s.dist += step;
-      if (Math.abs(walker.to - s.x) < 1e-3) { s.x = walker.to; const w = walker; walker = null; w.done(); }
-    }
-    s.legAmp += ((walker ? 1 : 0) - s.legAmp) * Math.min(1, dt * 7);
-    if (blinkT >= 0) { blinkT += dt; if (blinkT > 0.18) blinkT = -1; }
+    // The head eases toward the butterfly rather than snapping to it.
+    const bx = s.bx + 5 * Math.sin(time * 1.9);
+    const by = s.by + 7 * Math.sin(time * 2.7);
+    const k = Math.min(1, dt * 2.5);
+    trail.look += (gdClamp((bx - 50) / 70, -1, 1) - trail.look) * k;
+    trail.rot += (gdClamp((bx - 50) / 12, -7, 7) - trail.rot) * k;
+    trail.y += (gdClamp((by - 40) / 16, -2.5, 1) - trail.y) * k;
+    // Ears: a soft spring that lags the head, then settles.
+    const rot = s.headRot * (1 - s.follow) + trail.rot * s.follow;
+    lagVel += (60 * (rot - lagRot) - 9 * lagVel) * dt;
+    lagRot += lagVel * dt;
+    if (blinkT >= 0) { blinkT += dt; if (blinkT > 0.2) blinkT = -1; }
     else if ((blinkIn -= dt) <= 0) { blinkT = 0; blinkIn = 2.5 + Math.random() * 4.5; }
+    if ((twitchIn -= dt) <= 0) {
+      twitchIn = 7 + Math.random() * 7;
+      const ear = Math.random() < 0.5 ? "earL" : "earR";
+      (async () => { await tween(ear, 9, 180); await tween(ear, -2, 220); await tween(ear, 0, 260); })().catch(() => {});
+    }
     apply();
     raf = requestAnimationFrame(frame);
   }
 
   return {
-    s, tween, tweenAll, wait, walkTo, turn, changePose, hop, wag, apply, bounds: getBounds, home: onHome,
+    s, tween, tweenAll, wait, apply,
     start() { raf = requestAnimationFrame(frame); },
     destroy() { dead = true; cancelAnimationFrame(raf); [...pending].forEach((done) => done()); },
   };
 }
 
-// ---- Activities ------------------------------------------------------
-async function gdLeaveHome(e) {
-  e.home(false);
-  await e.changePose("lie", "stand"); // stands up in the doorway
-  await e.wait(250);
-}
-async function gdGoHome(e) {
-  await e.tweenAll({ neck: 0, tilt: 0, turn: 1, bow: 0, crouch: 0 }, 450);
-  if (e.s.x > GD_REST_X + 40) await e.walkTo(GD_REST_X + 40); // back to the house
-  await e.turn(-1);
-  await e.tweenAll({ neck: 42, crouch: 0.7 }, 500); // ducks its head
-  await e.walkTo(GD_INSIDE_X, GD_WALK * 0.85); // and walks in head first
-  await e.wait(1200); // out of sight inside
-  Object.assign(e.s, { flip: 1, x: GD_HIDDEN_X }); // turns around inside
-  const out = ((GD_REST_X - GD_HIDDEN_X) / (GD_WALK * 0.85)) * 1000;
-  await Promise.all([
-    e.walkTo(GD_REST_X, GD_WALK * 0.85), // head and front paws come back out of the doorway
-    (async () => { await e.wait(out * 0.55); await e.tweenAll({ neck: 0, crouch: 0 }, 600); })(),
-  ]);
-  await e.changePose("stand", "lie", 650); // and it settles down
-  e.tween("perk", 0, 400);
-  e.home(true);
-}
-
+// ---- Things it does from the doorway ---------------------------------
 async function gdButterfly(e) {
-  const { maxX, width } = e.bounds();
-  const s = e.s;
-  Object.assign(s, { bx: width + 20, by: -70, bOp: 0 });
-  e.tween("bOp", 1, 700);
-  await e.tweenAll({ bx: 175, by: -22 }, 3400); // flutters in
-  await e.tweenAll({ perk: 22, lieHead: -9 }, 450); // notices it: head up, ears perk
-  await e.wait(900);
-  e.tween("lieHead", 0, 700);
-  await gdLeaveHome(e);
-  const target = Math.max(GD_REST_X + 50, Math.min(maxX, GD_REST_X + 200));
-  const ms = ((target - s.x) / GD_TROT) * 1000;
-  await Promise.all([e.tweenAll({ bx: target + 145, by: -30 }, ms + 500), e.walkTo(target, GD_TROT, "trot")]);
-  await e.tween("bow", 1, 450); // play-bow
-  await e.wait(700);
-  await e.tween("bow", 0, 350);
-  await e.hop();
-  e.tweenAll({ bx: width + 80, by: GD_SCENE_TOP - 60 }, 2800); // off it goes
-  e.tween("bOp", 0, 2800, gdEaseIn);
-  await e.tween("neck", -14, 500); // watches it go
-  await e.wag(1800);
+  Object.assign(e.s, { bx: GD_VIEW.x + GD_VIEW.w + 10, by: -70 });
+  e.tween("bOp", 1, 800);
+  e.tween("follow", 1, 1200); // the head starts to follow it
+  await e.tweenAll({ bx: 130, by: 8 }, 3600); // flutters in on a wavy path
+  e.tween("perk", 1, 600); // ears perk up
+  await e.tweenAll({ bx: 86, by: 30 }, 1800);
+  await e.tween("paw", 1, 650); // lifts a paw, playfully
   await e.wait(500);
-  await gdGoHome(e);
+  await e.tween("paw", 0, 700);
+  await e.wait(400);
+  e.tween("bOp", 0, 3400);
+  e.tweenAll({ bx: GD_VIEW.x + GD_VIEW.w + 30, by: GD_VIEW.y - 20 }, 3400); // and off it goes
+  await e.wait(1800);
+  await e.tweenAll({ follow: 0, perk: 0 }, 1200); // settles back down
 }
 
-async function gdSniffTrail(e) {
-  const { maxX } = e.bounds();
-  await gdLeaveHome(e);
-  await e.walkTo(Math.min(maxX, GD_REST_X + 30));
-  await e.tweenAll({ neck: 62, crouch: 1 }, 700); // nose to the ground
-  let x = e.s.x;
-  for (let i = 0; i < 4 && x < maxX - 20; i++) {
-    x = Math.min(maxX, x + 35 + Math.random() * 45);
-    await e.walkTo(x, GD_WALK * 0.7);
-    await e.tween("neck", 68, 350); // sniffs the spot
-    await e.tween("neck", 60, 350);
-    if (i % 2) await e.wag(700);
-    else await e.wait(400);
+async function gdYawn(e) {
+  await e.tweenAll({ noseUp: 0.6, sleep: 0.9 }, 900);
+  await e.tween("yawn", 1, 1100);
+  await e.wait(800);
+  await e.tween("yawn", 0, 900);
+  await e.tweenAll({ noseUp: 0, sleep: 0 }, 800);
+}
+
+async function gdHeadTilt(e) {
+  const dir = Math.random() < 0.5 ? 1 : -1;
+  await e.tweenAll({ headRot: 12 * dir, perk: 0.4 }, 800);
+  await e.wait(1600);
+  await e.tweenAll({ headRot: 0, perk: 0 }, 850);
+}
+
+async function gdSniffAir(e) {
+  await e.tween("noseUp", 1, 700);
+  for (let i = 0; i < 4; i++) {
+    await e.tween("sniff", 1, 170);
+    await e.tween("sniff", 0, 230);
+    if (i === 1) await e.wait(350);
   }
-  await e.tweenAll({ neck: -10, crouch: 0 }, 700); // looks up, satisfied
-  await e.wag(1200);
-  await gdGoHome(e);
-}
-
-async function gdStandWatch(e) {
-  const { maxX } = e.bounds();
-  await gdLeaveHome(e);
-  await e.walkTo(maxX); // the far side, away from the house
-  const glance = async (hold) => { await e.tween("turn", 0.72, 550); await e.wait(hold); await e.tween("turn", 1, 550); };
-  await e.tween("neck", -8, 700);
-  await e.wait(1500 + Math.random() * 1500);
-  await glance(1800); // toward the viewer
-  await e.turn(-1);
-  await e.tween("neck", 4, 600);
-  await e.wait(1500 + Math.random() * 2000);
-  await e.turn(1);
-  await e.tween("neck", -6, 600);
-  await glance(1500 + Math.random() * 1500);
-  await e.wait(800);
-  await gdGoHome(e);
-}
-
-async function gdSitAndLook(e) {
-  const { maxX } = e.bounds();
-  await gdLeaveHome(e);
-  await e.walkTo(Math.min(maxX, GD_REST_X + 110 + Math.random() * 80));
-  await e.changePose("stand", "sit", 650);
-  await e.wait(900);
-  await e.tween("tilt", 13, 450); // head tilt
-  await e.wait(1300);
-  await e.tween("tilt", -9, 600);
-  await e.wait(1200);
-  await e.tween("tilt", 0, 450);
-  await e.wait(800);
-  await e.changePose("sit", "stand", 650);
-  await gdGoHome(e);
-}
-
-async function gdStretch(e) {
-  const { maxX } = e.bounds();
-  await gdLeaveHome(e);
-  await e.walkTo(Math.min(maxX, GD_REST_X + 50));
-  await e.tween("bow", 1, 1000); // a big front stretch
-  await e.wait(1400);
-  await e.tween("bow", 0, 700);
-  await e.tween("neck", -16, 500); // a yawn
-  await e.tween("yawn", 1, 600);
-  await e.wait(900);
-  await e.tween("yawn", 0, 450);
-  await e.tween("neck", 0, 400);
-  await e.tween("shake", 1, 150); // a shake
-  await e.wait(800);
-  await e.tween("shake", 0, 250);
-  await gdGoHome(e); // then back to lie down
+  await e.wait(300);
+  await e.tween("noseUp", 0, 800);
 }
 
 async function gdNap(e) {
-  await e.tween("sleep", 1, 900);
-  await e.tween("zzz", 1, 600);
-  await e.wait(14000 + Math.random() * 10000);
-  await e.tween("zzz", 0, 600);
-  await e.tween("sleep", 0, 500);
+  await e.tween("sleep", 1, 1200);
+  await e.tween("zzz", 1, 800);
+  await e.wait(12000 + Math.random() * 8000);
+  await e.tween("zzz", 0, 700);
+  await e.tween("sleep", 0, 900);
 }
 
-const GD_ACTIVITIES = [
-  { name: "butterfly", run: gdButterfly, roams: true },
-  { name: "sniff", run: gdSniffTrail, roams: true },
-  { name: "watch", run: gdStandWatch, roams: true },
-  { name: "sit", run: gdSitAndLook, roams: true },
-  { name: "stretch", run: gdStretch, roams: true },
-  { name: "nap", run: gdNap, roams: false },
+const GD_ACTIONS = [
+  { name: "butterfly", run: gdButterfly },
+  { name: "yawn", run: gdYawn },
+  { name: "tilt", run: gdHeadTilt },
+  { name: "sniff", run: gdSniffAir },
+  { name: "nap", run: gdNap },
 ];
 
-// Rests for 15 to 40 seconds, then picks an activity (never the same
-// one twice in a row), then rests again.
-async function gdLife(e, canStart, onActivity) {
+// Rests for 10 to 25 seconds, then does one thing (never the same one
+// twice in a row), then rests again.
+async function gdLife(e, canStart, onAction) {
   let lastName = null;
   for (;;) {
-    await e.wait(15000 + Math.random() * 25000);
+    await e.wait(10000 + Math.random() * 15000);
     while (!canStart()) await e.wait(1000);
-    const room = e.bounds().maxX >= GD_REST_X + 80;
-    const options = GD_ACTIVITIES.filter((a) => a.name !== lastName && (room || !a.roams));
+    const options = GD_ACTIONS.filter((a) => a.name !== lastName);
     const pick = options[Math.floor(Math.random() * options.length)];
     lastName = pick.name;
-    onActivity(pick.name);
+    onAction(pick.name);
     await pick.run(e);
-    onActivity("rest");
+    onAction("rest");
   }
 }
 
 // ---- Drawing ---------------------------------------------------------
-function GdHead({ eyeRef, earRef, mouthRef }) {
+function GdLeg({ x }) {
   const dark = COLORS.bg;
   return (
-    <>
-      <path d="M88 12 C88 7 92 4 98 4 L104 5 C106 6 107 8 108 9 L120 10 C122 10 123 12 123 14 L123 21 C123 23 122 24 120 24 L108 25 C104 26 100 26 97 25 C92 23 88 18 88 12 Z" />
-      {mouthRef && <path ref={mouthRef} opacity="0" fill={dark} d="M108 19.5 L123 18.5 L123 26.5 C118 28 112 27 108.5 22 Z" />}
-      <path fill="none" stroke={dark} strokeWidth="1.3" strokeLinecap="round" d="M122.5 18.5 L112 19.5" />
-      <ellipse ref={eyeRef} cx="105" cy="11" rx="1.6" ry="1.2" fill={dark} />
-      <g ref={earRef}>
-        <g className="gd-part gd-ear">
-          <path fill={COLORS.goldDark} d="M92 6.5 C95.5 4.5 100.5 4.8 102.5 7.5 L101.8 11 C100.8 15 98.8 18.5 96.5 20 C94.5 18.5 93 15 92.2 11 Z" />
-          <path fill="none" stroke={dark} strokeWidth="1" strokeLinecap="round" d="M92.2 8 C92.8 13.5 94.4 17.8 96.5 20 C98.8 18.5 100.8 15 101.8 11" />
-        </g>
-      </g>
-    </>
-  );
-}
-
-function GdHouse({ front }) {
-  const gold = COLORS.gold;
-  const face = <path d={`M60 2 L80 -26 L100 2 V62 H60 Z ${GD_DOOR}`} fillRule="evenodd" fill={COLORS.surface} />;
-  const trim = <path fill="none" strokeWidth="3" strokeLinecap="round" d="M57 5 L80 -28 L103 5" />;
-  if (front) {
-    return <g stroke={gold} strokeWidth="1.4" strokeLinejoin="round">{face}{trim}</g>;
-  }
-  return (
-    <g stroke={gold} strokeWidth="1.4" strokeLinejoin="round">
-      <path d={GD_DOOR} fill={COLORS.playfield} stroke="none" />
-      <path d="M0 2 H60 V62 H0 Z" fill={COLORS.secondary} />
-      <path fill="none" stroke={COLORS.goldDark} strokeWidth="0.8" strokeOpacity="0.6" d="M2 14 H58 M2 26 H58 M2 38 H58 M2 50 H58" />
-      <path d="M22 -30 H80 L57 3 H-6 Z" fill={COLORS.secondary} />
-      {face}
-      {trim}
+    <g stroke={dark} strokeWidth="1.1" strokeLinejoin="round">
+      <path d={`M${x - 6} 98 V86 C${x - 6} 81.5 ${x - 3.2} 79.5 ${x} 79.5 C${x + 3.2} 79.5 ${x + 6} 81.5 ${x + 6} 86 V98 Z`} />
+      <path d={`M${x - 8.5} 97 C${x - 8.5} 93 ${x - 4.5} 91.8 ${x} 91.8 C${x + 4.5} 91.8 ${x + 8.5} 93 ${x + 8.5} 97 C${x + 8.5} 99.2 ${x + 6} 100 ${x} 100 C${x - 6} 100 ${x - 8.5} 99.2 ${x - 8.5} 97 Z`} />
+      <path fill="none" strokeWidth="0.9" strokeLinecap="round" d={`M${x - 2.8} 95.6 V99 M${x} 95.2 V99.4 M${x + 2.8} 95.6 V99`} />
     </g>
   );
 }
 
-function GdButterfly({ nodeRef }) {
-  const gold = COLORS.gold;
-  return (
-    <g ref={nodeRef} opacity="0">
-      <g className="gd-part gd-wings">
-        <path fill={gold} d="M0 0 C-3 -8 -11 -10 -11 -4 C-11 0 -5 1 0 0 Z M0 0 C3 -8 11 -10 11 -4 C11 0 5 1 0 0 Z" />
-        <path fill={COLORS.goldDark} d="M0 0 C-2 3 -7 8 -8 4 C-8 2 -4 0.5 0 0 Z M0 0 C2 3 7 8 8 4 C8 2 4 0.5 0 0 Z" />
-      </g>
-      <ellipse cx="0" cy="0" rx="0.9" ry="3.4" fill={COLORS.goldDark} />
-    </g>
-  );
-}
-
-function GuideDogScene({ nodes, width, scale }) {
+function GuideDogScene({ nodes, scale }) {
   const r = (key) => (el) => { nodes[key] = el; };
   const gold = COLORS.gold;
   const dark = COLORS.bg;
-  const height = GD_SCENE_BOTTOM - GD_SCENE_TOP;
+  const earFill = COLORS.goldDark;
   return (
     <svg
       ref={r("svg")}
       className="gd-scene"
-      viewBox={`-8 ${GD_SCENE_TOP} ${width} ${height}`}
-      style={{ width: width * scale, height: height * scale }}
+      viewBox={`${GD_VIEW.x} ${GD_VIEW.y} ${GD_VIEW.w} ${GD_VIEW.h}`}
+      style={{ width: GD_VIEW.w * scale, height: GD_VIEW.h * scale }}
       aria-hidden="true"
       focusable="false"
     >
       <defs>
-        <mask id="gd-house-mask" maskUnits="userSpaceOnUse" x="-500" y="-500" width="5000" height="1200">
-          <rect x="-500" y="-500" width="5000" height="1200" fill="#fff" />
-          <path d="M-500 -500 H-254 L80 -28 L103.5 5 H101 V700 H-500 Z" fill="#000" />
-          <path d={GD_DOOR} fill="#fff" />
-        </mask>
+        <clipPath id="gd-door-clip"><path d={GD_DOOR} /></clipPath>
       </defs>
-      <GdHouse />
-      <g mask="url(#gd-house-mask)">
-        <g ref={r("root")}>
-          <g ref={r("flip")}>
-            <g ref={r("hop")} fill={gold}>
-              {/* Sphinx pose, in the lying frame (ground at 62). */}
-              <g ref={r("lie")}>
-                <path className="gd-part gd-breathe" d="M20 50 C20 38 30 32 46 32 L72 32 C80 32 86 36 88 44 L89 58 C89 61 87 62 84 62 L26 62 C21 62 19 58 20 54 Z" />
-                <path fill="none" stroke={dark} strokeWidth="1.4" strokeLinecap="round" d="M40 60 C33 56 31 46 37 40 C43 35 52 39 54 47" />
-                <path fill="none" stroke={dark} strokeWidth="1.2" strokeLinecap="round" d="M46 58.5 L60 58.5" />
-                <path d="M82 50 L114 53 C118 53.5 120 55.5 120 58.5 C120 61 119 62 117 62 L82 62 Z" />
-                <path fill="none" stroke={dark} strokeWidth="1.2" strokeLinecap="round" d="M90 57.5 L117 58.2" />
-                <path d="M72 36 C75 26 82 16 88 10 L100 10 L103 22 C100 30 96 38 92 52 L80 52 Z" />
-                <path fill="none" stroke={dark} strokeWidth="2" strokeLinecap="round" d="M82 24 L100 29" />
-                <g ref={r("lieHead")}>
-                  <GdHead eyeRef={r("lieEye")} earRef={r("lieEar")} />
-                  <path ref={r("lieEyeShut")} opacity="0" fill="none" stroke={dark} strokeWidth="1.2" strokeLinecap="round" d="M103 11.5 Q105 13.2 107.2 11.5" />
-                </g>
-              </g>
-              {/* Sitting, in the standing frame (ground at 98). */}
-              <g ref={r("sit")} opacity="0">
-                <path ref={r("sitTail")} fill="none" stroke={gold} strokeWidth="3" strokeLinecap="round" d="M26 94 C18 95.5 12 96.5 6 97" />
-                <path opacity="0.7" d="M76 60 H82 V95 L86 96 C87 96.5 87 98 86 98 H76 Z" />
-                <path d="M26 97 C19 97 17 88 21 80 C26 69 36 57 48 50 C58 44 66 40 74 40 C84 40 92 46 94 54 C95 60 92 66 88 68 C80 74 72 80 64 86 C58 92 50 97 44 97 Z" />
-                <path fill="none" stroke={dark} strokeWidth="1.4" strokeLinecap="round" d="M30 95 C27 85 33 74 45 72 C55 71 61 78 59 88" />
-                <path d="M44 93 H62 C64 93 65 98 62 98 H44 Z" />
-                <path d="M83 60 H90 V95 L94 96 C95 96.5 95 98 94 98 H83 Z" />
-                <path d="M68 44 C71 32 77 22 85 13 L98 11 L101 25 C98 33 95 42 93 52 Z" />
-                <path fill="none" stroke={dark} strokeWidth="2" strokeLinecap="round" d="M80 24.5 L98.5 29" />
-                <g ref={r("sitHead")} transform="translate(-2 0)">
-                  <GdHead eyeRef={r("sitEye")} earRef={r("sitEar")} />
-                </g>
-              </g>
-              {/* Standing and walking, in the standing frame. */}
-              <g ref={r("stand")} opacity="0">
-                <g ref={r("legFH")} opacity="0.7">
-                  <path d="M36 44 C44 44 50 52 48 62 L43 78 L43 95 L47 96 C48 96.5 48 98 47 98 L37 98 L37 81 C32 74 29 60 36 44 Z" />
-                </g>
-                <path ref={r("tail")} fill="none" stroke={gold} strokeWidth="3.2" strokeLinecap="round" d="M24 42 C17 48 14 58 14 67 C14 71 15.5 73.5 18 74" />
-                <g ref={r("front")}>
-                  <g ref={r("legFF")} opacity="0.7">
-                    <path d="M76 54 L83 54 L83 95 L87 96 C88 96.5 88 98 87 98 L76 98 Z" />
-                  </g>
-                  <path d="M25 40 C40 37.5 60 37 74 36 C82 35.5 88 38 92 44 C96 50 95 59 88 63 L72 64 C62 64 54 58 46 56 C40 55 34 57 30 56 C22 54 18 45 25 40 Z" />
-                  <g ref={r("neck")}>
-                    <path d="M70 42 C73 32 79 22 87 13 L100 11 L103 25 C100 33 97 42 95 52 Z" />
-                    <path fill="none" stroke={dark} strokeWidth="2" strokeLinecap="round" d="M82 24.5 L100.5 29" />
-                    <g ref={r("head")}>
-                      <GdHead eyeRef={r("eye")} earRef={r("ear")} mouthRef={r("mouth")} />
-                    </g>
-                  </g>
-                  <g ref={r("legNF")}>
-                    <path d="M83 54 L90 54 L90 95 L94 96 C95 96.5 95 98 94 98 L83 98 Z" />
-                  </g>
-                </g>
-                <g ref={r("legNH")}>
-                  <path d="M29 43 C38 43 44 51 42 61 L37 78 L37 95 L41 96 C42 96.5 42 98 41 98 L31 98 L31 81 C26 74 22 60 29 43 Z" />
-                </g>
-              </g>
+      <path d={GD_DOOR} fill={COLORS.playfield} />
+      {/* The dog, clipped to the doorway. */}
+      <g clipPath="url(#gd-door-clip)" fill={gold}>
+        <path ref={r("chest")} d="M34 100 C34 86 40 77 50 77 C60 77 66 86 66 100 Z" />
+        <path d="M41 82 C41 72 42 64 44 58 L56 58 C58 64 59 72 59 82 Z" />
+        <path fill="none" stroke={dark} strokeWidth="1.8" strokeLinecap="round" d="M42.5 70 Q50 72.5 57.5 70" />
+        <g ref={r("paw")}><GdLeg x={35} /></g>
+        <GdLeg x={65} />
+        <g ref={r("head")}>
+          <path d="M37 37 C37 32 42 30 50 30 C58 30 63 32 63 37 L62.2 51 C62 54 61.6 56 61.4 58 L61 62 C60.6 65 57 66.5 50 66.5 C43 66.5 39.4 65 39 62 L38.6 58 C38.4 56 38 54 37.8 51 Z" />
+          <g ref={r("face")}>
+            <path fill="none" stroke={dark} strokeWidth="0.9" strokeLinecap="round" d="M50 32.5 V38.5 M42.6 48 C42 52 42 56.5 43.2 61 M57.4 48 C58 52 58 56.5 56.8 61" />
+            <path fill="none" stroke={dark} strokeWidth="1.1" strokeLinecap="round" d="M41.8 39.2 Q44.5 38 47 39.4 M53 39.4 Q55.5 38 58.2 39.2" />
+            <g ref={r("eyes")} fill={dark}>
+              <ellipse cx="44.6" cy="42" rx="1.7" ry="1.5" />
+              <ellipse cx="55.4" cy="42" rx="1.7" ry="1.5" />
             </g>
+            <path ref={r("eyesShut")} opacity="0" fill="none" stroke={dark} strokeWidth="1.1" strokeLinecap="round" d="M42.8 42 Q44.6 43.6 46.4 42 M53.6 42 Q55.4 43.6 57.2 42" />
+            <ellipse ref={r("mouth")} opacity="0" cx="50" cy="62" rx="5.2" ry="4.6" fill={dark} />
+            <path fill="none" stroke={dark} strokeWidth="1.1" strokeLinecap="round" d="M50 56.6 V59.6 M44.2 60.4 C46.8 62.2 49 61.8 50 59.6 C51 61.8 53.2 62.2 55.8 60.4" />
+            <path ref={r("nose")} fill={dark} d="M45.2 52.2 C45.2 50.3 54.8 50.3 54.8 52.2 C54.8 55 52.3 56.6 50 56.6 C47.7 56.6 45.2 55 45.2 52.2 Z" />
+          </g>
+          <g ref={r("earL")}>
+            <path fill={earFill} stroke={dark} strokeWidth="0.8" strokeLinejoin="round" d="M39.6 31.4 C36 30.6 32 32 30.2 35.2 L35 47.2 C36.8 44.4 38.4 40 39.8 35.6 Z" />
+          </g>
+          <g ref={r("earR")}>
+            <path fill={earFill} stroke={dark} strokeWidth="0.8" strokeLinejoin="round" d="M60.4 31.4 C64 30.6 68 32 69.8 35.2 L65 47.2 C63.2 44.4 61.6 40 60.2 35.6 Z" />
           </g>
         </g>
       </g>
-      {/* The front wall and door frame, always drawn over the dog. */}
-      <GdHouse front />
-      <g ref={r("zzz")} opacity="0" fill={gold} fontFamily="'Space Mono', monospace" fontWeight="700">
-        <text className="gd-z" x="150" y="-2" fontSize="8">z</text>
-        <text className="gd-z gd-z2" x="156" y="-10" fontSize="10">z</text>
-        <text className="gd-z gd-z3" x="163" y="-20" fontSize="12">z</text>
+      {/* The house's front wall, with the doorway cut out, over the dog. */}
+      <g stroke={gold} strokeWidth="1.6" strokeLinejoin="round">
+        <path d={`M6 44 L50 6 L94 44 V100 H6 Z ${GD_DOOR}`} fillRule="evenodd" fill={COLORS.surface} />
+        <path fill="none" stroke={earFill} strokeWidth="0.9" strokeOpacity="0.7" d="M8 58 H22 M78 58 H92 M8 72 H22 M78 72 H92 M8 86 H22 M78 86 H92" />
+        <path d="M50 0 L104 46 L98 51 L50 9 L2 51 L-4 46 Z" fill={COLORS.surface} />
+        <path fill="none" strokeLinecap="round" d="M2 100 H98" />
       </g>
-      <GdButterfly nodeRef={r("bfly")} />
+      <g ref={r("zzz")} opacity="0" fill={gold} fontFamily="'Space Mono', monospace" fontWeight="700">
+        <text className="gd-z" x="66" y="24" fontSize="8">z</text>
+        <text className="gd-z gd-z2" x="73" y="14" fontSize="10">z</text>
+        <text className="gd-z gd-z3" x="81" y="3" fontSize="12">z</text>
+      </g>
+      <g ref={r("bfly")} opacity="0">
+        <g className="gd-part gd-wings">
+          <path fill={gold} d="M0 0 C-3 -8 -11 -10 -11 -4 C-11 0 -5 1 0 0 Z M0 0 C3 -8 11 -10 11 -4 C11 0 5 1 0 0 Z" />
+          <path fill={earFill} d="M0 0 C-2 3 -7 8 -8 4 C-8 2 -4 0.5 0 0 Z M0 0 C2 3 7 8 8 4 C8 2 4 0.5 0 0 Z" />
+        </g>
+        <ellipse cx="0" cy="0" rx="0.9" ry="3.4" fill={earFill} />
+      </g>
     </svg>
   );
 }
 
 const GUIDE_DOG_CSS = `
-  .gd-scene { position: fixed; left: 6px; bottom: calc(6px + env(safe-area-inset-bottom, 0px)); z-index: 30; pointer-events: none; overflow: visible; display: block; }
+  .gd-scene { position: fixed; left: 4px; bottom: calc(4px + env(safe-area-inset-bottom, 0px)); z-index: 30; pointer-events: none; overflow: visible; display: block; }
   .gd-home {
-    position: fixed; left: 6px; bottom: calc(6px + env(safe-area-inset-bottom, 0px)); z-index: 31;
+    position: fixed; z-index: 31; bottom: calc(4px + env(safe-area-inset-bottom, 0px));
     background: transparent; border: 0; padding: 0; margin: 0; cursor: pointer; border-radius: 10px; -webkit-tap-highlight-color: transparent;
   }
   .gd-home:focus { outline: none; }
@@ -3742,7 +3549,7 @@ const GUIDE_DOG_CSS = `
     display: flex; flex-direction: column; gap: 8px; animation: fadeIn 0.25s ease both;
   }
   .gd-bubble::after {
-    content: ""; position: absolute; left: var(--gd-tail-x, 72px); bottom: -7px; width: 12px; height: 12px;
+    content: ""; position: absolute; left: var(--gd-tail-x, 48px); bottom: -7px; width: 12px; height: 12px;
     background: ${COLORS.secondary}; border-right: 1px solid ${COLORS.strongLine}; border-bottom: 1px solid ${COLORS.strongLine};
     transform: rotate(45deg);
   }
@@ -3756,14 +3563,10 @@ const GUIDE_DOG_CSS = `
   }
   .gd-paw:hover { opacity: 1; }
   .gd-part { transform-box: fill-box; }
-  .gd-breathe { transform-origin: 50% 100%; animation: gdBreathe 4.8s ease-in-out infinite; }
-  .gd-ear { transform-origin: 50% 0%; animation: gdEar 13s ease-in-out infinite; }
-  .gd-wings { transform-origin: 50% 50%; animation: gdFlap 0.26s ease-in-out infinite alternate; }
+  .gd-wings { transform-origin: 50% 50%; animation: gdFlap 0.28s ease-in-out infinite alternate; }
   .gd-z { animation: gdZ 3s ease-in-out infinite; opacity: 0; }
   .gd-z2 { animation-delay: 1s; }
   .gd-z3 { animation-delay: 2s; }
-  @keyframes gdBreathe { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.035); } }
-  @keyframes gdEar { 0%, 60%, 68%, 100% { transform: rotate(0deg); } 63% { transform: rotate(-7deg); } 65.5% { transform: rotate(2deg); } }
   @keyframes gdFlap { from { transform: scaleX(1); } to { transform: scaleX(0.25); } }
   @keyframes gdZ { 0% { opacity: 0; transform: translate(0, 4px); } 30% { opacity: 1; } 100% { opacity: 0; transform: translate(4px, -8px); } }
   @media (prefers-reduced-motion: reduce) {
@@ -3783,13 +3586,7 @@ function PawIcon() {
   );
 }
 
-function gdMeasure() {
-  const vw = window.innerWidth;
-  const scale = (vw <= 600 ? 85 : 110) / 124;
-  const width = Math.min(vw - 16, 640) / scale;
-  // Roams at most about 270px from home, and never past the right edge.
-  return { scale, width, maxX: Math.min(width - 8 - 124 - 6, 300) };
-}
+const gdScale = () => (window.innerWidth <= 600 ? 0.8 : 1);
 
 function GuideDog({ view }) {
   const location = useLocation();
@@ -3797,14 +3594,11 @@ function GuideDog({ view }) {
   const [hidden, setHidden] = useState(false);
   const [open, setOpen] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
-  const [dims, setDims] = useState(null);
-  const [atHome, setAtHome] = useState(true);
+  const [scale, setScale] = useState(1);
   const nodes = useRef({}).current;
   const engineRef = useRef(null);
   const openRef = useRef(false);
-  const dimsRef = useRef(null);
   openRef.current = open;
-  dimsRef.current = dims;
 
   // Only in a real browser, after load. Headless Chromium (the prerender
   // step) reports navigator.webdriver, so the dog stays out of the HTML.
@@ -3827,7 +3621,7 @@ function GuideDog({ view }) {
 
   useEffect(() => {
     if (!ready) return;
-    const update = () => setDims(gdMeasure());
+    const update = () => setScale(gdScale());
     update();
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
@@ -3847,31 +3641,33 @@ function GuideDog({ view }) {
 
   // Starts the dog's life once the scene is on screen; with reduced
   // motion it just rests in the doorway, perfectly still.
-  const hasDims = !!dims;
   useEffect(() => {
-    if (!ready || hidden || !hasDims) return;
-    const e = createGuideDogEngine(nodes, () => dimsRef.current || gdMeasure(), setAtHome);
+    if (!ready || hidden) return;
+    const e = createGuideDogEngine(nodes);
     engineRef.current = e;
-    setAtHome(true);
     e.apply();
     if (!reducedMotion) {
       e.start();
-      const mark = (name) => { if (nodes.svg) nodes.svg.dataset.activity = name; };
+      const mark = (name) => { if (nodes.svg) nodes.svg.dataset.action = name; };
       mark("rest");
       gdLife(e, () => !openRef.current, mark).catch(() => {});
     }
     return () => { e.destroy(); engineRef.current = null; };
-  }, [ready, hidden, hasDims, reducedMotion]);
+  }, [ready, hidden, reducedMotion]);
 
-  if (!ready || !dims) return null;
+  // While its tip is open it lifts its head and looks at you.
+  useEffect(() => {
+    const e = engineRef.current;
+    if (!e || reducedMotion) return;
+    const values = open
+      ? { headY: -3, headRot: 0, look: 0, noseUp: 0, follow: 0, sleep: 0, zzz: 0, perk: 0.5 }
+      : { headY: 0, perk: 0 };
+    e.tweenAll(values, open ? 600 : 800).catch(() => {});
+  }, [open, reducedMotion]);
 
-  const toggleTip = () => {
-    if (!open && engineRef.current && !reducedMotion) {
-      const e = engineRef.current;
-      (async () => { await e.tween("perk", 18, 250); await e.wag(1200); await e.tween("perk", 0, 400); })().catch(() => {});
-    }
-    setOpen((o) => !o);
-  };
+  if (!ready) return null;
+
+  const toggleTip = () => setOpen((o) => !o);
   const hideDog = () => { setHidden(true); setOpen(false); };
   const showDog = () => setHidden(false);
 
@@ -3885,32 +3681,33 @@ function GuideDog({ view }) {
     setOpen(false);
   };
 
-  // The tappable area is the house, plus the dog while it's resting in
-  // the doorway. While the dog is out it never blocks taps on the page.
-  const { scale } = dims;
-  const homeWidth = ((atHome ? GD_REST_X + 125 : 104) + 8) * scale;
-  const homeHeight = (GD_SCENE_BOTTOM + 30) * scale;
+  // The tappable area is the house (with the dog in its doorway).
+  const homeStyle = {
+    left: 4 + (GD_HOME_BOX.x - GD_VIEW.x) * scale,
+    width: GD_HOME_BOX.w * scale,
+    height: GD_HOME_BOX.h * scale,
+  };
   const bubbleStyle = {
-    bottom: `calc(env(safe-area-inset-bottom, 0px) + ${Math.round(homeHeight + 16)}px)`,
-    "--gd-tail-x": `${Math.round((GD_REST_X + 110) * scale)}px`,
+    bottom: `calc(env(safe-area-inset-bottom, 0px) + ${Math.round(4 + GD_HOME_BOX.h * scale + 10)}px)`,
+    "--gd-tail-x": `${Math.round((50 - GD_VIEW.x) * scale - 6 - 6)}px`,
   };
 
   return (
     <>
       <style>{GUIDE_DOG_CSS}</style>
       {/* Keeps the end of every page clear of the dog and its house. */}
-      <div aria-hidden="true" style={{ height: 76, flexShrink: 0 }} />
+      <div aria-hidden="true" style={{ height: Math.round(GD_HOME_BOX.h * scale) + 12, flexShrink: 0 }} />
       {hidden ? (
         <button type="button" className="gd-paw" onClick={showDog} aria-label="Bring back the guide dog">
           <PawIcon />
         </button>
       ) : (
         <>
-          <GuideDogScene nodes={nodes} width={dims.width} scale={scale} />
+          <GuideDogScene nodes={nodes} scale={scale} />
           <button
             type="button"
             className="gd-home"
-            style={{ width: homeWidth, height: homeHeight }}
+            style={homeStyle}
             aria-label="Guide dog, tap for a tip"
             aria-expanded={open}
             aria-controls={open ? "gd-tip" : undefined}
