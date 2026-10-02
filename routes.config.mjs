@@ -13,7 +13,9 @@ export const SITE_URL = "https://benjaminmithra.com";
 
 export const ROUTES = [
   { path: "/", changefreq: "weekly", priority: "1.0" },
-  { path: "/journals", changefreq: "weekly", priority: "0.6" },
+  // Journals is hidden from the menus for now: still prerendered, so the
+  // URL keeps working, but left out of the sitemap.
+  { path: "/journals", changefreq: "weekly", priority: "0.6", sitemap: false },
   { path: "/exercises", changefreq: "monthly", priority: "0.8" },
   { path: "/exercises/breathing", changefreq: "monthly", priority: "0.6" },
   { path: "/exercises/leetspeak-reading", changefreq: "monthly", priority: "0.6" },

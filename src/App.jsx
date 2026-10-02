@@ -672,7 +672,6 @@ function CosmicBackground() {
 const SITE_HEADING = "Mind Interpreter";
 const LEET_MESSAGE = "Th3 m1nd 1s n0t 4 f1x3d th1ng, 1t 3v0lv3s w1th 3v3ry qu3st10n w3 4sk. 4w4r3n3ss sh4p3s 0ur p3rc3pt10n, wh1l3 m3m0ry, 4tt3nt10n, 1ntu1t10n 4nd r34s0n1ng sh4p3 h0w w3 1nt3rpr3t th3 w0rld. P4r4psych0l0gy 1nv1t3s us t0 3xpl0r3 wh4t l13s b3y0nd 0rd1n4ry 0bs3rv4t10n, wh1l3 c0gn1t10n h3lps us qu3st10n wh4t w3 th1nk w3 kn0w. Th3r3 1s 4lw4ys m0r3 t0 3xpl0r3, 4nd th3 m1nd 1s th3 pl4c3 t0 st4rt.";
 
-const PHILOSOPHY_TEXT = "There is more to experience than what the conscious mind immediately explains. Perception can be subtle, intuition can arrive before reasoning, and altered states can reveal unfamiliar ways of experiencing ourselves and the world. Anomalous experiences invite us to question where the boundaries of ordinary perception truly lie. This space is an exploration of those possibilities through curiosity, practice and an open mind.";
 
 // 500 provocative, self-inquiry style questions for the rotating
 // banner. Thirty are hand-written; the remaining 470 are built from
@@ -891,10 +890,10 @@ function HomeScreen({ onNavigate, onOpenExercise }) {
           <span style={styles(c).siteHeadingLine}>{SITE_HEADING}</span>
         </h1>
         <p style={styles(c).siteSubtitle}>Hi, I'm Benjamin Mithra</p>
+        <p style={styles(c).siteSubtitleLine}>Through listening and questions, I help untangle your thoughts and bring you real clarity.</p>
 
         <div style={styles(c).homeIntro}>
-          <p style={styles(c).homeIntroTagline}>You talk. I listen. We explore.</p>
-          <p style={styles(c).homeIntroText}>A private, one-to-one conversation about whatever is on your mind, with no judgment, no unasked-for advice, and nothing you need to prepare.</p>
+          <p style={styles(c).homeIntroText}>Private, judgment-free conversations about whatever is on your mind.</p>
           <Link to={VIEW_PATH.contact} className="nav-btn hero-btn" style={{ ...styles(c).heroBtn, ...styles(c).homeIntroBtn }}>How it works</Link>
         </div>
 
@@ -904,9 +903,17 @@ function HomeScreen({ onNavigate, onOpenExercise }) {
 
         <WriteToMeForm id="write-to-me" />
 
-        <p style={styles(c).homePhilosophy}>{PHILOSOPHY_TEXT}</p>
+        <p style={styles(c).homePhilosophy}>
+          This is a space to slow down and understand your own mind. Talk things through in a{" "}
+          <Link to={VIEW_PATH.contact} style={styles(c).homeInlineLink}>private conversation</Link>, or explore on your own:{" "}
+          <Link to={VIEW_PATH.exercises} style={styles(c).homeInlineLink}>Mind Exercises</Link> for calm and focus,{" "}
+          <Link to={VIEW_PATH.games} style={styles(c).homeInlineLink}>Brain Games</Link> for memory and thinking, and the{" "}
+          <Link to={VIEW_PATH.rvlab} style={styles(c).homeInlineLink}>RV Lab</Link> for something more curious.
+        </p>
 
         <HomeAmbientBreathing onOpenExercise={onOpenExercise} />{" "}
+
+        <p style={styles(c).homeIntroText}>Decoding numbers as letters breaks your brain's autopilot reading, training attention and visual pattern recognition.</p>
 
         <button type="button" style={styles(c).leetWrap} onClick={() => onOpenExercise("leet")} aria-label="Open Leetspeak Reading exercise">
           <div style={styles(c).leetSweep} aria-hidden="true" />
@@ -914,10 +921,9 @@ function HomeScreen({ onNavigate, onOpenExercise }) {
         </button>
 
         <div style={styles(c).heroButtonsGrid}>
-          <Link to={VIEW_PATH.journals} className="nav-btn hero-btn" style={styles(c).heroBtn}>Read</Link>{" "}
           <Link to={VIEW_PATH.exercises} className="nav-btn hero-btn" style={styles(c).heroBtn}>Exercise</Link>{" "}
           <Link to={VIEW_PATH.games} className="nav-btn hero-btn" style={styles(c).heroBtn}>Play</Link>{" "}
-          <Link to={VIEW_PATH.rvlab} className="nav-btn hero-btn" style={styles(c).heroBtn}>View</Link>
+          <Link to={VIEW_PATH.rvlab} className="nav-btn hero-btn" style={{ ...styles(c).heroBtn, ...styles(c).heroBtnCentered }}>View</Link>
         </div>
 
         <div style={styles(c).consultTeaserWrap}>
@@ -2172,7 +2178,7 @@ function GamesMenu({ onSelect }) {
   const c = useColors();
   return (
     <div style={styles(c).gamesMenuWrap} className="fade-in">
-      <p style={styles(c).rvHeading}>Games</p>
+      <p style={styles(c).rvHeading}>Brain Games</p>
       <p style={styles(c).instruction}>Choose a game to play or practice.</p>
       <div style={styles(c).gamesMenuGrid}>
         {GAME_TABS.map((t) => (
@@ -2215,7 +2221,7 @@ function ExercisesMenu({ onSelect }) {
   const c = useColors();
   return (
     <div style={styles(c).gamesMenuWrap} className="fade-in">
-      <p style={styles(c).rvHeading}>Exercises</p>
+      <p style={styles(c).rvHeading}>Mind Exercises</p>
       <p style={styles(c).instruction}>Choose an exercise to practice.</p>
       <div style={styles(c).exercisesMenuGrid}>
         {EXERCISE_TABS.map((t) => (
@@ -3754,9 +3760,8 @@ function pickRandomGame(excludeSet) { const remaining = GAMES.filter((g) => !exc
 
 const TOP_TABS = [
   { key: "home", label: "Home" },
-  { key: "journals", label: "Journals" },
-  { key: "exercises", label: "Exercises" },
-  { key: "games", label: "Games" },
+  { key: "exercises", label: "Mind Exercises" },
+  { key: "games", label: "Brain Games" },
   { key: "rvlab", label: "RV Lab" },
   { key: "contact", label: "Consultation" },
 ];
@@ -3799,12 +3804,12 @@ const EXERCISE_KEY_FROM_SLUG = Object.fromEntries(Object.entries(EXERCISE_SLUG).
 const PAGE_META = {
   home: { title: "Mind Interpreter | Benjamin Mithra", description: "Private one-to-one conversations with Benjamin Mithra, a Mind Interpreter. You talk, I listen, we explore: a space to be heard without judgment." },
   journals: { title: "Journals | Mind Interpreter", description: "Reflections and reading on consciousness, cognition, and mindfulness from Benjamin Mithra. New journal entries coming soon." },
-  exercises: { title: "Mindfulness and Cognitive Exercises | Mind Interpreter", description: "Guided mindfulness breathing, leetspeak reading, flow typing, and Guilford's divergent thinking test to train focus, calm, and cognitive fluency." },
+  exercises: { title: "Mind Exercises | Mind Interpreter", description: "Guided mindfulness breathing, leetspeak reading, flow typing, and Guilford's divergent thinking test to train focus, calm, and cognitive fluency." },
   "exercise-breathing": { title: "Mindfulness Breathing Exercise | Mind Interpreter", description: "A guided breathing exercise: inhale, hold, exhale, and hold again, paced to help you slow down and breathe more deliberately." },
   "exercise-leet": { title: "Leetspeak Reading Exercise | Mind Interpreter", description: "Decode short stories written in leetspeak to train visual attention, pattern recognition, and reading fluency." },
   "exercise-flowtype": { title: "Flow Type Exercise | Mind Interpreter", description: "Type continuously without stopping to build sustained focus and mental stamina under light pressure." },
   "exercise-guilford": { title: "Guilford's Test | Mind Interpreter", description: "A classic divergent thinking task: name unusual uses for an everyday object to exercise creative fluency." },
-  games: { title: "Memory and Cognitive Games | Mind Interpreter", description: "Chess, Recall, N Back, Card Memory, Word Memory, and Number Memory: games built to train focus, memory, and pattern recognition." },
+  games: { title: "Brain Games | Mind Interpreter", description: "Chess, Recall, N Back, Card Memory, Word Memory, and Number Memory: games built to train focus, memory, and pattern recognition." },
   "game-chess": { title: "Chess | Mind Interpreter", description: "Play chess against a built in engine, with a running timer and alternating colors each game." },
   "game-everyday": { title: "Recall: Everyday Memory Games | Mind Interpreter", description: "A rotating set of quick memory games: Digit Span, Word Recall, Kim's Game, Pattern Recall, Flash Grid, and Detective Case." },
   "game-nback": { title: "N Back Memory Game | Mind Interpreter", description: "A classic working memory task: spot the repeated pattern one step back in a moving sequence." },
@@ -4026,7 +4031,7 @@ export default function App() {
                   points: [
                     "There are no accounts, logins, or user profiles anywhere on this site.",
                     "Remote Viewing sketches, notes, and scores exist only in your browser while you're using them, and are never saved or sent anywhere.",
-                    "Nothing typed into the Exercises tab (Flow Type, Guilford's Test answers) is stored either.",
+                    "Nothing typed into the Mind Exercises tab (Flow Type, Guilford's Test answers) is stored either.",
                     "The Write to Me forms on the Home and Consultation pages are the one exception: the name, email, and message you submit there are sent to Formspree, a third-party form delivery service, which forwards it directly to the site owner's inbox. That message is not otherwise stored, published, or used for anything else.",
                     "No cookies, no localStorage, and no tracking of any kind are used on this site.",
                     "Loading the site's fonts (Google Fonts) and Remote Viewing target photos (Lorem Picsum) means your browser contacts those services directly, the same as most websites that use web fonts or hosted images.",
@@ -4167,13 +4172,14 @@ function styles(c) {
     siteLogo: { width: "clamp(40px, 11vw, 60px)", height: "auto", flexShrink: 0, display: "block" },
     siteHeadingLine: { display: "block", whiteSpace: "nowrap" },
     siteSubtitle: { fontFamily: font.body, fontSize: 19, lineHeight: 1.5, color: c.ink, margin: "-8px 0 0", textAlign: "center" },
+    siteSubtitleLine: { fontFamily: font.body, fontSize: 17, lineHeight: 1.55, color: c.ink, margin: "-10px 0 0", textAlign: "center", maxWidth: 480 },
     homeIntro: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, width: "100%", maxWidth: 480, margin: "4px 0 0" },
-    homeIntroTagline: { fontFamily: font.display, fontWeight: 500, fontSize: 21, letterSpacing: "0.04em", lineHeight: 1.35, color: c.gold, margin: 0, textAlign: "center" },
     homeIntroText: { fontFamily: font.body, fontSize: 16, lineHeight: 1.6, color: c.muted, margin: 0, textAlign: "center" },
     homeIntroBtn: { width: "auto", display: "inline-block", marginTop: 6 },
+    heroBtnCentered: { gridColumn: "1 / -1", justifySelf: "center", width: "calc(50% - 5px)" },
     heroButtonsGrid: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10, marginTop: 4, width: "100%", maxWidth: 300 },
     heroBtn: {
-      fontFamily: font.display, fontWeight: 500, fontSize: 14, letterSpacing: "0.05em", textTransform: "uppercase",
+      textDecoration: "none", textAlign: "center", fontFamily: font.display, fontWeight: 500, fontSize: 14, letterSpacing: "0.05em", textTransform: "uppercase",
       background: c.gold, color: "#111820", border: `1px solid ${c.gold}`, borderRadius: 6, padding: "9px 20px", cursor: "pointer",
       width: "100%", transition: "background 0.15s ease, border-color 0.15s ease",
     },
@@ -4201,6 +4207,7 @@ function styles(c) {
       padding: "8px 13px", borderRadius: 8, display: "inline-block", lineHeight: 1.2, whiteSpace: "nowrap", flexShrink: 0,
     },
 
+    homeInlineLink: { color: c.gold, textDecoration: "none", fontStyle: "normal" },
     homePhilosophy: {
       fontFamily: font.body, fontStyle: "italic", fontWeight: 400, fontSize: 16.5, lineHeight: 1.9,
       color: c.muted, maxWidth: 460, margin: "10px 0 0",
@@ -4212,7 +4219,7 @@ function styles(c) {
     },
     homeFooterDot: { color: c.line },
     homeFooterLink: {
-      fontFamily: font.mono, fontSize: 12, color: c.muted, background: "none", border: "none", cursor: "pointer", padding: 0,
+      textDecoration: "none", fontFamily: font.mono, fontSize: 12, color: c.muted, background: "none", border: "none", cursor: "pointer", padding: 0,
       transition: "color 0.15s ease",
     },
     homeQuestionBox: {
@@ -4225,7 +4232,7 @@ function styles(c) {
       letterSpacing: "0.01em", color: "#1B140D", margin: 0, textAlign: "center",
     },
     topBar: { position: "relative", zIndex: 100, width: "100%", maxWidth: 680, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 20px" },
-    cornerBtn: { fontFamily: font.display, fontWeight: 500, fontSize: 14, letterSpacing: "0.06em", textTransform: "uppercase", background: "transparent", border: "1px solid #3A5661", borderRadius: 6, padding: "7px 15px", color: "#D6DDE0", cursor: "pointer", transition: "background 0.15s ease, border-color 0.15s ease, color 0.15s ease" },
+    cornerBtn: { textDecoration: "none", fontFamily: font.display, fontWeight: 500, fontSize: 14, letterSpacing: "0.06em", textTransform: "uppercase", background: "transparent", border: "1px solid #3A5661", borderRadius: 6, padding: "7px 15px", color: "#D6DDE0", cursor: "pointer", transition: "background 0.15s ease, border-color 0.15s ease, color 0.15s ease" },
     cornerBtnActive: { background: c.gold, borderColor: c.gold, color: "#111820" },
 
     subTabBar: { display: "flex", gap: 8, width: "100%", maxWidth: 680, position: "relative", zIndex: 5, flexWrap: "nowrap", overflowX: "auto", paddingBottom: 6, WebkitOverflowScrolling: "touch" },
@@ -4239,7 +4246,7 @@ function styles(c) {
       display: "flex", flexDirection: "column", gap: 6, boxShadow: "0 12px 30px rgba(0,0,0,0.5)",
     },
     hamburgerMenuItem: {
-      fontFamily: font.display, fontWeight: 500, fontSize: 13.5, letterSpacing: "0.04em", textTransform: "uppercase",
+      textDecoration: "none", fontFamily: font.display, fontWeight: 500, fontSize: 13.5, letterSpacing: "0.04em", textTransform: "uppercase",
       background: "transparent", border: "1px solid #29414B", borderRadius: 6, padding: "9px 14px", color: "#D6DDE0",
       cursor: "pointer", outline: "none", textAlign: "left", width: "100%",
     },
@@ -4248,12 +4255,12 @@ function styles(c) {
     gamesMenuWrap: { display: "flex", flexDirection: "column", alignItems: "center", gap: 8, width: "100%", maxWidth: 560, margin: "0 auto", textAlign: "center" },
     gamesMenuGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 16, width: "100%", marginTop: 14 },
     gamesMenuCard: {
-      fontFamily: font.display, fontWeight: 600, fontSize: 17, letterSpacing: "0.03em", textTransform: "uppercase",
+      textDecoration: "none", textAlign: "center", fontFamily: font.display, fontWeight: 600, fontSize: 17, letterSpacing: "0.03em", textTransform: "uppercase",
       background: c.surface, border: "1px solid #29414B", borderRadius: 12, padding: "30px 16px", color: c.gold, cursor: "pointer", outline: "none",
     },
     exercisesMenuGrid: { display: "flex", flexDirection: "column", gap: 14, width: "100%", marginTop: 14 },
     exerciseMenuCard: {
-      display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, textAlign: "left",
+      textDecoration: "none", color: c.ink, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, textAlign: "left",
       background: c.surface, border: "1px solid #29414B", borderRadius: 12, padding: "20px 22px", cursor: "pointer", outline: "none", width: "100%", boxSizing: "border-box",
     },
     exerciseMenuCardTitle: { fontFamily: font.display, fontWeight: 600, fontSize: 17, letterSpacing: "0.03em", textTransform: "uppercase", color: c.gold },
@@ -4358,7 +4365,7 @@ function styles(c) {
     numTile: { background: c.panel, border: `1px solid ${c.line}`, borderRadius: 8, height: 52, fontFamily: font.mono, fontSize: 18, color: c.ink, cursor: "pointer", outline: "none", WebkitAppearance: "none", appearance: "none" },
     numTileUsed: { background: c.bg, opacity: 0.3 },
     btnPrimary: { fontFamily: font.display, fontSize: 15, letterSpacing: "0.04em", textTransform: "uppercase", background: c.good, color: "#0E1410", border: "none", borderRadius: 6, padding: "13px 24px", cursor: "pointer" },
-    btnGold: { fontFamily: font.display, fontSize: 15, letterSpacing: "0.04em", textTransform: "uppercase", background: c.gold, color: "#111820", border: "none", borderRadius: 6, padding: "13px 24px", cursor: "pointer" },
+    btnGold: { textDecoration: "none", fontFamily: font.display, fontSize: 15, letterSpacing: "0.04em", textTransform: "uppercase", background: c.gold, color: "#111820", border: "none", borderRadius: 6, padding: "13px 24px", cursor: "pointer" },
     btnGhost: { fontFamily: font.display, fontSize: 15, letterSpacing: "0.04em", textTransform: "uppercase", background: "transparent", color: c.ink, border: `1px solid ${c.line}`, borderRadius: 6, padding: "13px 20px", cursor: "pointer" },
     caseList: { textAlign: "left", fontSize: 14.5, lineHeight: 1.9, color: c.ink, maxWidth: 480, margin: 0, paddingLeft: 20 },
     caseItem: {},

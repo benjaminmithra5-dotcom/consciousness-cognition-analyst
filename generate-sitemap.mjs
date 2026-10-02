@@ -8,7 +8,9 @@ import { ROUTES, SITE_URL } from "./routes.config.mjs";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const today = new Date().toISOString().split("T")[0];
 
-const urlEntries = ROUTES.map(({ path: p, changefreq, priority }) => `  <url>
+const SITEMAP_ROUTES = ROUTES.filter((r) => r.sitemap !== false);
+
+const urlEntries = SITEMAP_ROUTES.map(({ path: p, changefreq, priority }) => `  <url>
     <loc>${SITE_URL}${p}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>${changefreq}</changefreq>
@@ -24,4 +26,4 @@ ${urlEntries}
 const distDir = path.join(__dirname, "dist");
 fs.mkdirSync(distDir, { recursive: true });
 fs.writeFileSync(path.join(distDir, "sitemap.xml"), xml);
-console.log(`Generated sitemap.xml with ${ROUTES.length} routes.`);
+console.log(`Generated sitemap.xml with ${SITEMAP_ROUTES.length} routes.`);
