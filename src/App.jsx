@@ -3165,14 +3165,10 @@ function EmailIcon() {
 
 function ContactScreen({ onNavigate }) {
   const c = useColors();
-  const headingRef = useRef(null);
-  useEffect(() => {
-    headingRef.current?.scrollIntoView({ behavior: "auto", block: "start" });
-  }, []);
   return (
     <div style={styles(c).contactOuter} className="fade-in">
       <div style={styles(c).contactCard}>
-        <p ref={headingRef} style={styles(c).contactBigHeading}>Private Consultation</p>
+        <p style={styles(c).contactBigHeading}>Private Consultation</p>
 
         <div style={styles(c).contactIntroRow}>
           <img src="/benjamin-mithra.jpg" alt="Benjamin Mithra" width="360" height="360" style={styles(c).contactPortrait} />
@@ -3940,7 +3936,7 @@ export default function App() {
 
         <CosmicBackground />
 
-        {view === "home" ? (
+        {view === "home" || view === "contact" ? (
           <div style={styles(c).topBar}>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center", width: "100%" }}>
               {TOP_TABS.map((t) => (
