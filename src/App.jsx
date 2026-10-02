@@ -3188,6 +3188,76 @@ function EmailIcon() {
   );
 }
 
+// The portrait, framed as a little house: the photo fills the square
+// body, and an SVG drawn over it adds the roof and gold outline. The
+// roof's base is the body's top edge, so they share one clean line.
+function HousePortrait() {
+  const c = useColors();
+  return (
+    <div style={styles(c).housePortrait}>
+      <img src="/benjamin-mithra.jpg" alt="Benjamin Mithra" width="360" height="360" style={styles(c).housePortraitPhoto} />
+      <svg viewBox="0 0 100 128" aria-hidden="true" focusable="false" style={styles(c).housePortraitFrame}>
+        <g stroke={c.gold} strokeWidth="2.4" strokeLinejoin="round" strokeLinecap="round">
+          <path d="M2 42 L50 5 L98 42 Z" fill={c.surface} />
+          <rect x="8" y="42" width="84" height="84" fill="none" />
+        </g>
+      </svg>
+    </div>
+  );
+}
+
+// Two chairs facing each other across a small round table, with a
+// steaming coffee on each side. The steam drifts up and fades on a
+// loop (held still with reduced motion).
+function CoffeeTableIllustration() {
+  const c = useColors();
+  return (
+    <svg
+      viewBox="0 0 280 150"
+      role="img"
+      aria-label="A table with two chairs and two cups of coffee, ready for a conversation"
+      style={styles(c).coffeeTable}
+    >
+      <style>{`
+        @keyframes coffeeSteam { 0% { opacity: 0; transform: translateY(4px); } 30% { opacity: 0.9; } 100% { opacity: 0; transform: translateY(-10px); } }
+        .coffee-steam { animation: coffeeSteam 3.4s ease-in-out infinite; }
+        .coffee-steam-2 { animation-delay: -1.1s; }
+        .coffee-steam-3 { animation-delay: -2.2s; }
+        @media (prefers-reduced-motion: reduce) { .coffee-steam { animation: none; opacity: 0.8; } }
+      `}</style>
+      <g fill="none" stroke={c.gold} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M18 141 H262" stroke={c.goldDark} strokeOpacity="0.55" strokeWidth="1.6" />
+        {/* Left chair, facing right */}
+        <path d="M45 100 L39 54 Q38.5 50 42.5 50 H45.5 Q49 50 49.5 54 L54 100" fill={c.surface} />
+        <path d="M44 100 H92 Q95 100 95 103 V105 Q95 108 92 108 H47 Q44 108 44 105 Z" fill={c.surface} />
+        <path d="M50 108 L46 140 M88 108 L92 140" />
+        {/* Right chair, facing left */}
+        <path d="M235 100 L241 54 Q241.5 50 237.5 50 H234.5 Q231 50 230.5 54 L226 100" fill={c.surface} />
+        <path d="M236 100 H188 Q185 100 185 103 V105 Q185 108 188 108 H233 Q236 108 236 105 Z" fill={c.surface} />
+        <path d="M230 108 L234 140 M192 108 L188 140" />
+        {/* Round table, from the side */}
+        <path d="M140 96 V136" />
+        <path d="M120 140 Q140 132 160 140" />
+        <ellipse cx="140" cy="91" rx="46" ry="6" fill={c.surface} />
+        {/* Two coffees */}
+        <path d="M106 71 H122 V81 Q122 85 118 85 H110 Q106 85 106 81 Z" fill={c.gold} />
+        <path d="M106 74 Q100 74 100 78 Q100 82 106 82" />
+        <path d="M101 86 H127" />
+        <path d="M158 71 H174 V81 Q174 85 170 85 H162 Q158 85 158 81 Z" fill={c.gold} />
+        <path d="M174 74 Q180 74 180 78 Q180 82 174 82" />
+        <path d="M153 86 H179" />
+        {/* Steam */}
+        <g strokeWidth="1.8">
+          <path className="coffee-steam" d="M111 64 C107 58 115 54 111 48 C107 42 115 38 111 32" />
+          <path className="coffee-steam coffee-steam-2" d="M117 64 C113 58 121 54 117 48 C113 42 121 38 117 34" />
+          <path className="coffee-steam coffee-steam-3" d="M163 64 C159 58 167 54 163 48 C159 42 167 38 163 32" />
+          <path className="coffee-steam coffee-steam-2" d="M169 64 C165 58 173 54 169 48 C165 42 173 38 169 34" />
+        </g>
+      </g>
+    </svg>
+  );
+}
+
 function ContactScreen({ onNavigate }) {
   const c = useColors();
   return (
@@ -3196,7 +3266,7 @@ function ContactScreen({ onNavigate }) {
         <p style={styles(c).contactBigHeading}>Private Consultation</p>
 
         <div style={styles(c).contactIntroRow}>
-          <img src="/benjamin-mithra.jpg" alt="Benjamin Mithra" width="360" height="360" style={styles(c).contactPortrait} />
+          <HousePortrait />
           <div style={styles(c).contactBubbleStack}>
             {CONTACT_INTRO_BUBBLES.map((b, i) => (
               <Fragment key={i}>
@@ -3213,6 +3283,11 @@ function ContactScreen({ onNavigate }) {
           <p key={i} style={styles(c).contactBody}>{t}</p>
         ))}
         <p style={styles(c).contactClosing}>This is a private space for conversation, reflection and understanding.</p>
+
+        <div style={styles(c).contactFirstHourWrap}>
+          <p style={styles(c).contactFirstHour}>Your first hour is on me.</p>
+          <CoffeeTableIllustration />
+        </div>
 
         <div style={styles(c).contactDivider} />
 
@@ -4445,11 +4520,15 @@ function styles(c) {
     writeToMeError: { fontFamily: font.display, fontWeight: 500, fontSize: 13.5, color: c.bad, margin: 0 },
     writeToMeSuccess: { fontFamily: font.display, fontWeight: 500, fontSize: 13.5, color: c.good, margin: 0 },
     contactIntroRow: { display: "flex", flexWrap: "wrap", alignItems: "center", gap: 20 },
-    contactPortrait: {
-      width: "clamp(104px, 28vw, 132px)", height: "auto", aspectRatio: "1 / 1", objectFit: "cover", borderRadius: "50%",
-      border: `2px solid ${c.gold}`, padding: 3, background: c.secondary, flexShrink: 0, display: "block",
-      boxShadow: "0 10px 26px rgba(0,0,0,0.45)",
+    housePortrait: { position: "relative", width: "clamp(130px, 30vw, 160px)", aspectRatio: "100 / 128", flexShrink: 0 },
+    housePortraitPhoto: {
+      position: "absolute", left: "8%", top: `${(42 / 128) * 100}%`, width: "84%", height: `${(84 / 128) * 100}%`,
+      objectFit: "cover", objectPosition: "50% 50%", display: "block",
     },
+    housePortraitFrame: { position: "absolute", inset: 0, width: "100%", height: "100%", overflow: "visible" },
+    contactFirstHourWrap: { display: "flex", flexDirection: "column", alignItems: "center", gap: 12, margin: "12px 0 4px" },
+    contactFirstHour: { fontFamily: font.display, fontWeight: 500, fontSize: 24, letterSpacing: "0.03em", lineHeight: 1.3, color: c.gold, margin: 0, textAlign: "center", textWrap: "balance" },
+    coffeeTable: { width: "clamp(220px, 58vw, 280px)", height: "auto", display: "block", overflow: "visible" },
     contactBubbleStack: { display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 10 },
     contactBubble: {
       fontFamily: font.body, fontSize: 16, lineHeight: 1.45, color: c.ink, background: "rgba(255,255,255,0.05)",
