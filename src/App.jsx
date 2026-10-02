@@ -3841,11 +3841,11 @@ const FAQ_SECTIONS = [
   {
     heading: "About the conversations",
     items: [
-      { q: "What is a Mind Interpreter?", a: ["A Mind Interpreter doesn't read minds. Through listening and questions, I help untangle your thoughts and bring you real clarity. You do the talking, and I help you put what's going on inside into words you can understand."] },
+      { q: "Wait, are you going to read my mind?", a: ["No, I don't read minds. Through listening and questions, I help untangle your thoughts and bring you real clarity. You do the talking, and I help you put what's going on inside into words you can understand."] },
       {
-        q: "What can I talk about?",
+        q: "Is there anything I can't talk about?",
         a: [
-          "Anything at all. Some people come with something heavy, and some just need to say something out loud for the first time. For example:",
+          "Not really. Some people come with something heavy, and some just need to say something out loud for the first time. For example:",
           {
             list: [
               "The thought that keeps you awake at 3 a.m.",
@@ -3863,20 +3863,20 @@ const FAQ_SECTIONS = [
           "There's no topic too small, too strange, or too personal. If it's on your mind, it belongs here.",
         ],
       },
-      { q: "Do I need to prepare anything?", a: ["No. You don't need to know where the conversation should go. A few words to start are enough."] },
-      { q: "How is this different from therapy?", a: ["These conversations aren't therapy, counselling, or medical or psychological treatment, and I don't diagnose or treat any condition. They're a space to be heard and to think clearly. If you're seeing a therapist, this can sit alongside that, but it isn't a replacement."] },
-      { q: "How is it different from talking to a friend?", a: ["A friend often has opinions, history with you, or advice to give. Here, there's no judgment, no unasked-for advice, and nothing you say affects anyone in your life."] },
-      { q: "Will you tell me what to do?", a: ["No. I ask questions and help you see your own thoughts more clearly. The decisions are always yours."] },
+      { q: "What if I don't know where to begin?", a: ["That's completely fine. You don't need to prepare anything or know where the conversation should go. A few words to start are enough, and we'll find our way from there."] },
+      { q: "Isn't this just therapy?", a: ["No. These conversations aren't therapy, counselling, or medical or psychological treatment, and I don't diagnose or treat any condition. They're a space to be heard and to think clearly. If you're seeing a therapist, this can sit alongside that, but it isn't a replacement."] },
+      { q: "Why not just talk to a friend?", a: ["Friends are wonderful, but they often have opinions, history with you, or advice to give, and some things are hard to say to people who know you. Here, there's no judgment, no unasked-for advice, and nothing you say affects anyone in your life."] },
+      { q: "Are you going to give me advice?", a: ["No. I ask questions and help you see your own thoughts more clearly. The decisions are always yours."] },
     ],
   },
   {
     heading: "Sessions and booking",
     items: [
-      { q: "How long is a session?", a: ["60 minutes."] },
-      { q: "How do sessions happen?", a: ["By video or voice call, on an app we agree on beforehand. You can keep your camera off if you prefer."] },
-      { q: "I'm not in India. Can we still talk?", a: ["Yes. Tell me your time zone and I'll find a time that works for you."] },
+      { q: "Can talking about my feelings for 60 minutes really bring change?", a: ["It can. Each session is a full, uninterrupted hour, which is something most people rarely get. Saying things out loud, without being judged or interrupted, often helps you see them more clearly than going over them alone. Some people leave feeling lighter after one conversation, and others come back to keep exploring. I can't promise any particular result, but I can promise you'll be truly heard."] },
+      { q: "Do I have to show my face?", a: ["No. Sessions are by video or voice call, on an app we agree on beforehand, and you can keep your camera off if you prefer."] },
+      { q: "You're in India and I'm not. Will the timing work?", a: ["Yes. Tell me your time zone and I'll find a time that works for you."] },
       {
-        q: "How do I book?",
+        q: "How do we start the conversation?",
         a: [{
           parts: [
             "Send me a message on ",
@@ -3889,31 +3889,31 @@ const FAQ_SECTIONS = [
           ],
         }],
       },
-      { q: "Is the first session really free?", a: ["Yes, your first hour is on me. After that, sessions are $25 USD each."] },
-      { q: "How do I pay?", a: ["We'll go over payment options during our call, so you can choose what works best for you."] },
-      { q: "Can I reschedule or cancel?", a: ["Yes, just let me know 24 hours before."] },
-      { q: "Who are sessions for?", a: ["Sessions are for adults aged 18 and over."] },
-      { q: "What language are sessions in?", a: ["English only."] },
+      { q: "Is the first hour really free? What's the catch?", a: ["No catch. Your first hour is on me. After that, sessions are $25 USD each, and only if you want to continue."] },
+      { q: "How do I pay after that?", a: ["We'll go over payment options during our call, so you can choose what works best for you."] },
+      { q: "What if something comes up and I can't make it?", a: ["No problem. Just let me know 24 hours before, and we'll reschedule."] },
+      { q: "Is there an age limit?", a: ["Yes. Sessions are for adults aged 18 and over."] },
+      { q: "What language do we talk in?", a: ["English only."] },
     ],
   },
   {
     heading: "Privacy and safety",
     items: [
-      { q: "Is what I say kept private?", a: ["Yes. What you share stays private and is never shared with anyone, except where the law requires it or where someone's immediate safety is at serious risk."] },
-      { q: "What happens to my contact details?", a: ["Your messages and contact details are only used to arrange and hold our conversations. They're never sold, shared, or added to any mailing list, and you can ask for them to be deleted at any time."] },
-      { q: "What if I'm in crisis?", a: ["Please don't wait for a session. Contact your local emergency services or a crisis line right away (for example, 988 in the US)."] },
+      { q: "Will anyone else ever know what I said?", a: ["No. What you share stays private and is never shared with anyone, except where the law requires it or where someone's immediate safety is at serious risk."] },
+      { q: "What do you do with my number and email?", a: ["Only what's needed to arrange and hold our conversations. Your contact details are never sold, shared, or added to any mailing list, and you can ask me to delete them at any time."] },
+      { q: "What if I'm really not okay right now?", a: ["Please don't wait for a session. Contact your local emergency services or a crisis line right away (for example, 988 in the US)."] },
     ],
   },
   {
     heading: "The website",
     items: [
-      { q: "Are the Brain Games and Mind Exercises free?", a: ["Yes. Everything on the site is free to use, with no sign-up."] },
-      { q: "Do I need an account?", a: ["No. There are no accounts, logins, cookies or tracking on this site."] },
-      { q: "Are my game scores or answers saved?", a: ["No. Nothing you type or play is stored or sent anywhere."] },
-      { q: "What do the Brain Games train?", a: ["Memory, attention and thinking: Chess for strategy, Recall and N Back for working memory, and Card, Word and Number Memory for recall."] },
-      { q: "What do the Mind Exercises do?", a: ["They train calm and focus: Mindfulness Breathing slows you down, Leetspeak Reading sharpens attention, Flow Type builds focus stamina, and Guilford's Test exercises creative thinking."] },
-      { q: "What is the RV Lab?", a: ["A space to practise remote viewing, an experimental exercise in perception. You sketch and describe a hidden target offline, then reveal the image. It's exploratory and experimental, not a scientifically proven method."] },
-      { q: "Who is the dog?", a: ["That's Diego, my pet! Tap him on any page for a tip."] },
+      { q: "Do I have to pay for the games and exercises?", a: ["No. Everything on the site is free to use."] },
+      { q: "Do I need to sign up?", a: ["No. There are no accounts, logins, cookies or tracking on this site. Just open a game or exercise and start."] },
+      { q: "Is anything I type or play saved?", a: ["No. Nothing you type or play is stored or sent anywhere. Once you leave the page, it's gone."] },
+      { q: "What are the Brain Games good for?", a: ["Memory, attention and thinking: Chess for strategy, Recall and N Back for working memory, and Card, Word and Number Memory for recall."] },
+      { q: "What do the Mind Exercises actually do?", a: ["They train calm and focus: Mindfulness Breathing slows you down, Leetspeak Reading sharpens attention, Flow Type builds focus stamina, and Guilford's Test exercises creative thinking."] },
+      { q: "What's the RV Lab?", a: ["A space to practise remote viewing, an experimental exercise in perception. You sketch and describe a hidden target offline, then reveal the image. It's exploratory and experimental, not a scientifically proven method."] },
+      { q: "Who's the dog?", a: ["That's Diego, my pet! Tap him on any page for a tip."] },
     ],
   },
 ];
