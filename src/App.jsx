@@ -4102,18 +4102,33 @@ const PAGE_META = {
   disclaimer: { title: "Disclaimer | Mind Interpreter", description: "Conversations here are not therapy or medical care, and the site's exercises and remote viewing content are educational and experimental." },
 };
 
-function useDocumentMeta(key) {
+const SITE_URL = "https://benjaminmithra.com";
+
+// Finds a <meta> or <link> in <head> by one attribute, creating it if
+// it isn't there yet, then sets its value.
+function setHeadTag(tagName, matchAttr, matchValue, valueAttr, value) {
+  let tag = document.head.querySelector(`${tagName}[${matchAttr}="${matchValue}"]`);
+  if (!tag) {
+    tag = document.createElement(tagName);
+    tag.setAttribute(matchAttr, matchValue);
+    document.head.appendChild(tag);
+  }
+  tag.setAttribute(valueAttr, value);
+}
+
+function useDocumentMeta(key, pathname) {
   useEffect(() => {
     const meta = PAGE_META[key] || PAGE_META.home;
+    // Canonical form: no www, no trailing slash except the home page.
+    const path = pathname.length > 1 ? pathname.replace(/\/+$/, "") : "/";
+    const url = `${SITE_URL}${path}`;
     document.title = meta.title;
-    let tag = document.querySelector('meta[name="description"]');
-    if (!tag) {
-      tag = document.createElement("meta");
-      tag.setAttribute("name", "description");
-      document.head.appendChild(tag);
-    }
-    tag.setAttribute("content", meta.description);
-  }, [key]);
+    setHeadTag("meta", "name", "description", "content", meta.description);
+    setHeadTag("link", "rel", "canonical", "href", url);
+    setHeadTag("meta", "property", "og:title", "content", meta.title);
+    setHeadTag("meta", "property", "og:description", "content", meta.description);
+    setHeadTag("meta", "property", "og:url", "content", url);
+  }, [key, pathname]);
 }
 
 export default function App() {
@@ -4141,7 +4156,7 @@ export default function App() {
   }, [location.pathname]);
 
   const metaKey = view === "games" && gameTab ? `game-${gameTab}` : view === "exercises" && exerciseTab ? `exercise-${exerciseTab}` : view;
-  useDocumentMeta(metaKey);
+  useDocumentMeta(metaKey, location.pathname);
 
   const [menuOpen, setMenuOpen] = useState(false);
 
