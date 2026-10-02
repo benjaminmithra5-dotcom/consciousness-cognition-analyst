@@ -2786,7 +2786,7 @@ function GuilfordTestExercise() {
 // =================================================================
 // Journals — reserved, empty for now
 // =================================================================
-function PlaceholderScreen({ title, note, points, onNavigate }) {
+function PlaceholderScreen({ title, note, points, sections, onNavigate }) {
   const c = useColors();
   return (
     <div style={styles(c).gameBox}>
@@ -2798,6 +2798,15 @@ function PlaceholderScreen({ title, note, points, onNavigate }) {
           {points.map((p, i) => (<li key={i} style={styles(c).placeholderListItem}>{p}</li>))}
         </ul>
       )}
+
+      {sections && sections.map((section) => (
+        <div key={section.heading} style={styles(c).placeholderSection}>
+          <h2 style={styles(c).placeholderSubhead}>{section.heading}</h2>
+          <ul style={styles(c).placeholderList}>
+            {section.points.map((p, i) => (<li key={i} style={styles(c).placeholderListItem}>{p}</li>))}
+          </ul>
+        </div>
+      ))}
 
       {onNavigate && (
         <p style={styles(c).homeFooterLine}>
@@ -3806,7 +3815,7 @@ const PAGE_META = {
   contact: { title: "Private Consultation | Benjamin Mithra, Mind Interpreter", description: "A private one to one conversation with Benjamin Mithra, a Mind Interpreter. You talk, I listen, we explore: a space for conversation, reflection, and understanding." },
   privacy: { title: "Privacy Policy | Mind Interpreter", description: "How this site handles data: no accounts, no tracking, and what actually happens with the Write to Me form." },
   terms: { title: "Terms | Mind Interpreter", description: "Terms for using this site's games, exercises, and remote viewing content." },
-  disclaimer: { title: "Disclaimer | Mind Interpreter", description: "This site is educational and experimental, and is not a substitute for medical, psychiatric, or licensed psychological care." },
+  disclaimer: { title: "Disclaimer | Mind Interpreter", description: "Conversations here are not therapy or medical care, and the site's exercises and remote viewing content are educational and experimental." },
 };
 
 function useDocumentMeta(key) {
@@ -4029,14 +4038,29 @@ export default function App() {
           {view === "disclaimer" && (
             <PlaceholderScreen
               title="Disclaimer"
-              note="This website provides educational, experimental and personal development content. It is not a substitute for medical, psychiatric or licensed psychological care. More specifically:"
-              points={[
-                "Nothing on this site diagnoses, treats, cures, or prevents any medical, psychiatric, or psychological condition.",
-                "Remote Viewing is presented as an educational and experimental practice, not established medical treatment or a replacement for professional judgment.",
-                "No claim is made that a user's perceptions during a Remote Viewing session correspond to objective fact about any target.",
-                "No game or exercise here, including Leetspeak Reading, Flow Type, or Guilford's Test, is claimed to raise IQ or change brain function in any clinically proven way.",
-                "Using this site does not create a doctor, therapist, psychologist, or attorney relationship with anyone.",
-                "This is not an emergency service. If you're in a medical or mental health crisis, please contact local emergency services or a qualified professional directly.",
+              note="This website offers private one-to-one conversations, along with educational, experimental and personal development content. None of it is a substitute for medical, psychiatric or licensed psychological care."
+              sections={[
+                {
+                  heading: "About the conversations",
+                  points: [
+                    "Conversations with Benjamin Mithra are a space to talk, reflect and be heard. They are not therapy, counselling, coaching for clinical issues, or medical, psychiatric or psychological treatment.",
+                    "Benjamin Mithra is not a licensed therapist, psychologist, counsellor or medical professional, and does not diagnose, treat or offer clinical advice for any condition.",
+                    "Conversations can sit alongside care from a doctor or therapist, but are not a replacement for it. Please don't stop or change any treatment based on a conversation.",
+                    "Sessions are for adults aged 18 and over.",
+                    "Any decisions you make after a conversation are your own.",
+                    "If you're in crisis or thinking about harming yourself or someone else, please don't wait for a session. Contact your local emergency services or a crisis line right away (for example, 988 in the US).",
+                  ],
+                },
+                {
+                  heading: "About the site's content",
+                  points: [
+                    "Nothing on this site diagnoses, treats, cures, or prevents any medical, psychiatric, or psychological condition.",
+                    "Remote Viewing is presented as an educational and experimental practice, not established medical treatment or a replacement for professional judgment.",
+                    "No claim is made that a user's perceptions during a Remote Viewing session correspond to objective fact about any target.",
+                    "No game or exercise here, including Leetspeak Reading, Flow Type, or Guilford's Test, is claimed to raise IQ or change brain function in any clinically proven way.",
+                    "Using this site does not create a doctor, therapist, psychologist, or attorney relationship with anyone.",
+                  ],
+                },
               ]}
             />
           )}
@@ -4330,6 +4354,8 @@ function styles(c) {
       fontFamily: font.body, fontSize: 15, lineHeight: 1.75, color: c.ink, margin: "6px 0 0",
       paddingLeft: 22, textAlign: "left", maxWidth: 480, listStyleType: "disc",
     },
+    placeholderSection: { width: "100%", maxWidth: 480, textAlign: "left" },
+    placeholderSubhead: { fontFamily: font.display, fontWeight: 500, fontSize: 14, letterSpacing: "0.08em", textTransform: "uppercase", color: c.gold, margin: "0 0 4px" },
     placeholderListItem: { fontFamily: font.body, fontSize: 15, lineHeight: 1.75, color: c.ink, marginBottom: 8 },
 
     cardScreenWrap: { position: "relative", width: "100%", display: "flex", justifyContent: "center", paddingTop: 50 },
