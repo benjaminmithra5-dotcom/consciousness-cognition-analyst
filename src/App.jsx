@@ -921,9 +921,10 @@ function HomeScreen({ onNavigate, onOpenExercise }) {
         </button>
 
         <div style={styles(c).heroButtonsGrid}>
-          <Link to={VIEW_PATH.exercises} className="nav-btn hero-btn" style={styles(c).heroBtn}>Exercise</Link>{" "}
-          <Link to={VIEW_PATH.games} className="nav-btn hero-btn" style={styles(c).heroBtn}>Play</Link>{" "}
-          <Link to={VIEW_PATH.rvlab} className="nav-btn hero-btn" style={{ ...styles(c).heroBtn, ...styles(c).heroBtnCentered }}>View</Link>
+          <Link to="/games/chess" className="nav-btn hero-btn" style={{ ...styles(c).heroBtn, ...styles(c).heroGridBtn }}>Play Chess</Link>{" "}
+          <Link to="/exercises/guilfords-test" className="nav-btn hero-btn" style={{ ...styles(c).heroBtn, ...styles(c).heroGridBtn }}>Try Guilford's Test</Link>{" "}
+          <Link to="/games/recall" className="nav-btn hero-btn" style={{ ...styles(c).heroBtn, ...styles(c).heroGridBtn }}>Practice Recall</Link>{" "}
+          <Link to="/exercises/flow-type" className="nav-btn hero-btn" style={{ ...styles(c).heroBtn, ...styles(c).heroGridBtn }}>Try Flow Type</Link>
         </div>
 
         <div style={styles(c).consultTeaserWrap}>
@@ -4176,8 +4177,8 @@ function styles(c) {
     homeIntro: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, width: "100%", maxWidth: 480, margin: "4px 0 0" },
     homeIntroText: { fontFamily: font.body, fontSize: 16, lineHeight: 1.6, color: c.muted, margin: 0, textAlign: "center" },
     homeIntroBtn: { width: "auto", display: "inline-block", marginTop: 6 },
-    heroBtnCentered: { gridColumn: "1 / -1", justifySelf: "center", width: "calc(50% - 5px)" },
-    heroButtonsGrid: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10, marginTop: 4, width: "100%", maxWidth: 300 },
+    heroButtonsGrid: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10, marginTop: 4, width: "100%", maxWidth: 380 },
+    heroGridBtn: { display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1.3, padding: "9px 12px", boxSizing: "border-box", minWidth: 0 },
     heroBtn: {
       textDecoration: "none", textAlign: "center", fontFamily: font.display, fontWeight: 500, fontSize: 14, letterSpacing: "0.05em", textTransform: "uppercase",
       background: c.gold, color: "#111820", border: `1px solid ${c.gold}`, borderRadius: 6, padding: "9px 20px", cursor: "pointer",
