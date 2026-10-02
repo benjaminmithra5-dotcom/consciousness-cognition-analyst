@@ -3217,7 +3217,7 @@ function ContactScreen({ onNavigate }) {
             </li>
           ))}
         </ol>
-        <p style={styles(c).contactBody}>What you share stays private and is never shared with anyone.</p>
+        <p style={styles(c).contactBody}>What you share stays private and is never shared with anyone, except where the law requires it or where someone's immediate safety is at serious risk.</p>
 
         <div style={styles(c).contactDivider} />
 
@@ -3813,7 +3813,7 @@ const PAGE_META = {
   "game-numbers": { title: "Number Memory Game | Mind Interpreter", description: "Memorize a growing sequence of digits and recall it back correctly." },
   rvlab: { title: "Remote Viewing Lab | Mind Interpreter", description: "Practice remote viewing with a freehand sketch, session notes, and a hidden target reveal, exploring anomalous perception and parapsychology." },
   contact: { title: "Private Consultation | Benjamin Mithra, Mind Interpreter", description: "A private one to one conversation with Benjamin Mithra, a Mind Interpreter. You talk, I listen, we explore: a space for conversation, reflection, and understanding." },
-  privacy: { title: "Privacy Policy | Mind Interpreter", description: "How this site handles data: no accounts, no tracking, and what actually happens with the Write to Me form." },
+  privacy: { title: "Privacy Policy | Mind Interpreter", description: "How conversations and this site handle your information: conversations stay private, and the site uses no accounts, cookies, or tracking." },
   terms: { title: "Terms | Mind Interpreter", description: "Terms for using this site's games, exercises, and remote viewing content." },
   disclaimer: { title: "Disclaimer | Mind Interpreter", description: "Conversations here are not therapy or medical care, and the site's exercises and remote viewing content are educational and experimental." },
 };
@@ -4009,15 +4009,30 @@ export default function App() {
           {view === "privacy" && (
             <PlaceholderScreen
               title="Privacy"
-              note="This site does not use accounts, cookies, or any form of storage. Here's what that actually means:"
-              points={[
-                "There are no accounts, logins, or user profiles anywhere on this site.",
-                "Remote Viewing sketches, notes, and scores exist only in your browser while you're using them, and are never saved or sent anywhere.",
-                "Nothing typed into the Exercises tab (Flow Type, Guilford's Test answers) is stored either.",
-                "The Write to Me form on the Home page is the one exception: the name, email, and message you submit there are sent to Formspree, a third-party form delivery service, which forwards it directly to the site owner's inbox. That message is not otherwise stored, published, or used for anything else.",
-                "No cookies, no localStorage, and no tracking of any kind are used on this site.",
-                "Loading the site's fonts (Google Fonts) and Remote Viewing target photos (Lorem Picsum) means your browser contacts those services directly, the same as most websites that use web fonts or hosted images.",
-                "No analytics services or advertising networks are used here.",
+              note="This site does not use accounts, cookies, or any form of storage, and conversations are kept private. Here's what that actually means:"
+              sections={[
+                {
+                  heading: "About the conversations",
+                  points: [
+                    "If you contact me by WhatsApp, email or the Write to Me form, your messages and contact details are used only to arrange and hold our conversations.",
+                    "Calls take place on a standard video or voice call app that we agree on beforehand (such as WhatsApp or Zoom). That app's own privacy policy applies to the call itself. You can keep your camera off if you prefer.",
+                    "What you share in a conversation stays private and is never shared with anyone, except where the law requires it or where someone's immediate safety is at serious risk.",
+                    "Your contact details are never sold, shared, or added to any mailing list.",
+                    "You can ask at any time for your messages and contact details to be deleted.",
+                  ],
+                },
+                {
+                  heading: "About the website",
+                  points: [
+                    "There are no accounts, logins, or user profiles anywhere on this site.",
+                    "Remote Viewing sketches, notes, and scores exist only in your browser while you're using them, and are never saved or sent anywhere.",
+                    "Nothing typed into the Exercises tab (Flow Type, Guilford's Test answers) is stored either.",
+                    "The Write to Me forms on the Home and Consultation pages are the one exception: the name, email, and message you submit there are sent to Formspree, a third-party form delivery service, which forwards it directly to the site owner's inbox. That message is not otherwise stored, published, or used for anything else.",
+                    "No cookies, no localStorage, and no tracking of any kind are used on this site.",
+                    "Loading the site's fonts (Google Fonts) and Remote Viewing target photos (Lorem Picsum) means your browser contacts those services directly, the same as most websites that use web fonts or hosted images.",
+                    "No analytics services or advertising networks are used here.",
+                  ],
+                },
               ]}
             />
           )}
