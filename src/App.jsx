@@ -756,34 +756,34 @@ const DAILY_QUESTIONS = buildDailyQuestionPool();
 // fear-toned, anger-toned, sadness-toned, and the more complex or
 // muted states) rather than an attempt at a literal exhaustive list.
 const EMOTION_COLORS = {
-  JOY: "#F4C542", HOPE: "#D9A441", LOVE: "#C96A7B", TRUST: "#66BFA3", CURIOSITY: "#D98A45",
-  WONDER: "#4FA3D1", SURPRISE: "#6BAED6", PRIDE: "#B99A4A", CONFIDENCE: "#C49A4A",
-  FEAR: "#8B6FAE", ANXIETY: "#75658F", DREAD: "#554667", ANGER: "#C94F4F", RAGE: "#A93232", PAIN: "#B85C5C",
-  SHAME: "#8A5967", GUILT: "#75636B", DISGUST: "#788F45", DESPAIR: "#514C5C",
-  SADNESS: "#557A9E", SORROW: "#496982", LONELINESS: "#5E647D", LONGING: "#A66A72",
-  ACCEPTANCE: "#8FAF91", PEACE: "#8FAFA8", SERENITY: "#B2B8A3",
+  JOY: "#DBBD5E", HOPE: "#CBBB8C", LOVE: "#AB465D", TRUST: "#38744B", CURIOSITY: "#E1A26C",
+  WONDER: "#8DC2E7", SURPRISE: "#B2DEE9", PRIDE: "#D1A975", CONFIDENCE: "#E6A07C",
+  FEAR: "#685C96", ANXIETY: "#B4ADCC", DREAD: "#3C375B", ANGER: "#B74349", RAGE: "#8D2520", PAIN: "#9B504E",
+  SHAME: "#7D5C6D", GUILT: "#634E60", DISGUST: "#696F33", DESPAIR: "#223041",
+  SADNESS: "#446B80", SORROW: "#355C7E", LONELINESS: "#556379", LONGING: "#91576D",
+  ACCEPTANCE: "#99C094", PEACE: "#BCD9CE", SERENITY: "#CFDDDB",
 
-  GRATITUDE: "#C9A227", CONTENTMENT: "#9CB68A", EXCITEMENT: "#E8A23D", ENTHUSIASM: "#E0982E", AMUSEMENT: "#E0B24A",
-  OPTIMISM: "#D9B24A", BLISS: "#E3B94A", EUPHORIA: "#E8C24A", SATISFACTION: "#C7A94E", RELIEF: "#8CB6A8",
+  GRATITUDE: "#C5AC69", CONTENTMENT: "#B6D7B5", EXCITEMENT: "#D3A849", ENTHUSIASM: "#DEA354", AMUSEMENT: "#E7C88E",
+  OPTIMISM: "#D4CC88", BLISS: "#E3D8B0", EUPHORIA: "#E5DE7D", SATISFACTION: "#DEC4A4", RELIEF: "#91C4AD",
 
-  AWE: "#4B8FBF", REVERENCE: "#3E6E8E", INSPIRATION: "#4F8FA8", FASCINATION: "#4E86A6", ANTICIPATION: "#D98A45",
+  AWE: "#246C99", REVERENCE: "#284B63", INSPIRATION: "#8CD2E9", FASCINATION: "#1C748E", ANTICIPATION: "#E9BC9B",
 
-  COMPASSION: "#C97F8C", EMPATHY: "#B97D8A", TENDERNESS: "#D18A9A", AFFECTION: "#C97A8B", ADMIRATION: "#C9974A",
-  PASSION: "#C1443F", DESIRE: "#B4523F", INFATUATION: "#CC7A93", HEARTBREAK: "#6B3E4A",
+  COMPASSION: "#D79EB4", EMPATHY: "#EFADAB", TENDERNESS: "#EABED0", AFFECTION: "#EB96A0", ADMIRATION: "#EFC3C2",
+  PASSION: "#A73A31", DESIRE: "#9E3341", INFATUATION: "#EFACD0", HEARTBREAK: "#6A2F3C",
 
-  JEALOUSY: "#6B7D4A", ENVY: "#6F7A3E", CONTEMPT: "#6B5A55", HATRED: "#7A2E2E",
-  FRUSTRATION: "#B25B4A", IRRITATION: "#B06B4E", RESENTMENT: "#7A4A4A", BITTERNESS: "#6E4A52",
+  JEALOUSY: "#4E602F", ENVY: "#AFBD72", CONTEMPT: "#585033", HATRED: "#641A1A",
+  FRUSTRATION: "#A7513B", IRRITATION: "#E5A998", RESENTMENT: "#713A2B", BITTERNESS: "#744642",
 
-  GRIEF: "#43506B", HURT: "#9A5A5E", REGRET: "#6E5A5E", EMBARRASSMENT: "#C98A94", HUMILIATION: "#8A4A55",
-  MELANCHOLY: "#556B85", NOSTALGIA: "#8E7A6B", HOMESICKNESS: "#7E8CA0",
+  GRIEF: "#1B3D5F", HURT: "#8C5A5F", REGRET: "#C6B2BC", EMBARRASSMENT: "#D0A3A6", HUMILIATION: "#784857",
+  MELANCHOLY: "#A4BCD7", NOSTALGIA: "#D1AF9F", HOMESICKNESS: "#AACADC",
 
-  VULNERABILITY: "#8F7690", CONFUSION: "#7D6E8A", OVERWHELM: "#5C5470", NUMBNESS: "#6B6B6B", APATHY: "#74746C",
-  INDIFFERENCE: "#7A7A72", BOREDOM: "#7C7C74", HOPELESSNESS: "#4A4550", HELPLESSNESS: "#565064",
+  VULNERABILITY: "#DBCADC", CONFUSION: "#5A5C7A", OVERWHELM: "#464776", NUMBNESS: "#B0B0B0", APATHY: "#6C6965",
+  INDIFFERENCE: "#C9C6C1", BOREDOM: "#595A5C", HOPELESSNESS: "#3C4657", HELPLESSNESS: "#A8B1BF",
 
-  PANIC: "#6E4E8A", TERROR: "#4A2E5C", WORRY: "#7A6E96", NERVOUSNESS: "#8A7EA0",
-  DISAPPOINTMENT: "#6E5E68", DISCOURAGEMENT: "#665A62", PESSIMISM: "#5A525C",
+  PANIC: "#764C8F", TERROR: "#3B2657", WORRY: "#C6C4DE", NERVOUSNESS: "#C0A7D4",
+  DISAPPOINTMENT: "#5C6B76", DISCOURAGEMENT: "#4A5661", PESSIMISM: "#404448",
 
-  DETERMINATION: "#C77E3A", COURAGE: "#C1652E", CALM: "#8FB0AC",
+  DETERMINATION: "#8C4F24", COURAGE: "#A65025", CALM: "#9BC6C0",
 };
 
 // Computes plain black or white per WCAG relative-luminance rules, so
@@ -939,10 +939,10 @@ function HomeScreen({ onNavigate, onOpenExercise }) {
           <div className="emotion-marquee-track" style={styles(c).emotionMarqueeTrack}>
             {[0, 1].map((copy) => (
               <div key={copy} style={styles(c).emotionMarqueeCopy}>
-                {Object.keys(EMOTION_COLORS).map((name, i) => (
+                {Object.entries(EMOTION_COLORS).map(([name, color], i) => (
                   <Fragment key={name}>
                     {i > 0 && " "}
-                    <span style={styles(c).emotionBox}>
+                    <span style={{ ...styles(c).emotionBox, background: color, color: getContrastText(color) }}>
                       {name}
                     </span>
                   </Fragment>
@@ -2279,8 +2279,6 @@ const BREATH_BALL_EXPANDED_SCALE = 1.85;
 const HOME_BREATH_BALL_REST = 46;
 
 const HOME_BREATH_LABELS = { in: "Inhale", hold1: "Hold", out: "Exhale", hold2: "Hold" };
-// Home uses gold tones instead of the exercise's phase colours.
-const HOME_BREATH_COLORS = { in: COLORS.gold, hold1: COLORS.goldDark, out: COLORS.gold, hold2: COLORS.goldDark };
 
 function HomeAmbientBreathing({ onOpenExercise }) {
   const c = useColors();
@@ -2317,7 +2315,7 @@ function HomeAmbientBreathing({ onOpenExercise }) {
 
   return (
     <button type="button" style={styles(c).homeBreathFrame} onClick={() => onOpenExercise("breathing")} aria-label="Open Mindfulness Breathing exercise">
-      <div style={{ ...styles(c).homeBreathBall, left: `${pos.x}%`, top: `${pos.y}%`, background: HOME_BREATH_COLORS[phase.key], transform: `translate(-50%, -50%) scale(${ballScale})`, transition: ballTransition }}>
+      <div style={{ ...styles(c).homeBreathBall, left: `${pos.x}%`, top: `${pos.y}%`, background: phase.color, transform: `translate(-50%, -50%) scale(${ballScale})`, transition: ballTransition }}>
         <span style={styles(c).homeBreathBallLabel}>{HOME_BREATH_LABELS[phase.key]}</span>
       </div>
     </button>
@@ -4508,7 +4506,6 @@ function styles(c) {
     emotionBox: {
       fontFamily: font.mono, fontWeight: 700, fontSize: 12.5, letterSpacing: "0.03em", textTransform: "uppercase",
       padding: "8px 13px", borderRadius: 8, display: "inline-block", lineHeight: 1.2, whiteSpace: "nowrap", flexShrink: 0,
-      background: c.surface, border: `1px solid ${c.line}`, color: c.ink,
     },
 
     homeInlineLink: { color: c.gold, textDecoration: "none", fontStyle: "normal" },
