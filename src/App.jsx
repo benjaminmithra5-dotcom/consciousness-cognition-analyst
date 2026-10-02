@@ -3357,6 +3357,7 @@ const GUIDE_DOG_TIPS = {
   games: { text: "Sniffing out a challenge? Chess is my favourite.", link: { to: "/games/chess", label: "Play chess" } },
   rvlab: { text: "Do your session on paper first, then come back here." },
   journals: { text: "New writing is on its way." },
+  faq: { text: "Hi, I'm Diego! Can't find your answer? Write to me.", link: { to: "/consultation", label: "Go to Consultation" } },
   other: { text: "Want to talk? I'll show you the way.", link: { to: "/consultation", label: "Go to Consultation" } },
 };
 
@@ -3797,7 +3798,7 @@ function GuideDog({ view }) {
       {/* Keeps the end of every page clear of the dog and its house. */}
       <div aria-hidden="true" style={{ height: Math.round(GD_HOME_BOX.h * scale) + 12, flexShrink: 0 }} />
       {hidden ? (
-        <button type="button" className="gd-paw" onClick={showDog} aria-label="Bring back the guide dog">
+        <button type="button" className="gd-paw" onClick={showDog} aria-label="Bring back Diego the guide dog">
           <PawIcon />
         </button>
       ) : (
@@ -3807,7 +3808,7 @@ function GuideDog({ view }) {
             type="button"
             className="gd-home"
             style={homeStyle}
-            aria-label="Guide dog, tap for a tip"
+            aria-label="Diego the guide dog, tap for a tip"
             aria-expanded={open}
             aria-controls={open ? "gd-tip" : undefined}
             onClick={toggleTip}
@@ -3830,6 +3831,206 @@ function GuideDog({ view }) {
 }
 
 // =================================================================
+// FAQ. One list of questions drives both the page and its FAQPage
+// structured data, so the two can never disagree. An answer is a list
+// of blocks: a plain string (a paragraph), { list: [...] } (bullets),
+// or { parts: [...] } (a paragraph with inline links, where a link is
+// { text, href } for outside links or { text, to } for site pages).
+// =================================================================
+const FAQ_SECTIONS = [
+  {
+    heading: "About the conversations",
+    items: [
+      { q: "What is a Mind Interpreter?", a: ["A Mind Interpreter doesn't read minds. Through listening and questions, I help untangle your thoughts and bring you real clarity. You do the talking, and I help you put what's going on inside into words you can understand."] },
+      {
+        q: "What can I talk about?",
+        a: [
+          "Anything at all. Some people come with something heavy, and some just need to say something out loud for the first time. For example:",
+          {
+            list: [
+              "The thought that keeps you awake at 3 a.m.",
+              "Feeling stuck, in a job, a relationship, or your own head",
+              "Something you can't say to your family, friends or partner",
+              "A decision you keep going back and forth on",
+              "Guilt, regret, or anger you've been carrying quietly",
+              "Loneliness, even when you're surrounded by people",
+              "A strange dream, a coincidence, or an experience you can't explain",
+              "A fantasy, a daydream, or a \"what if\" life you've imagined but never told anyone",
+              "A big idea, a question about life, or something you're just curious about",
+              "Good news or excitement that nobody around you seems to share",
+            ],
+          },
+          "There's no topic too small, too strange, or too personal. If it's on your mind, it belongs here.",
+        ],
+      },
+      { q: "Do I need to prepare anything?", a: ["No. You don't need to know where the conversation should go. A few words to start are enough."] },
+      { q: "How is this different from therapy?", a: ["These conversations aren't therapy, counselling, or medical or psychological treatment, and I don't diagnose or treat any condition. They're a space to be heard and to think clearly. If you're seeing a therapist, this can sit alongside that, but it isn't a replacement."] },
+      { q: "How is it different from talking to a friend?", a: ["A friend often has opinions, history with you, or advice to give. Here, there's no judgment, no unasked-for advice, and nothing you say affects anyone in your life."] },
+      { q: "Will you tell me what to do?", a: ["No. I ask questions and help you see your own thoughts more clearly. The decisions are always yours."] },
+    ],
+  },
+  {
+    heading: "Sessions and booking",
+    items: [
+      { q: "How long is a session?", a: ["60 minutes."] },
+      { q: "How do sessions happen?", a: ["By video or voice call, on an app we agree on beforehand. You can keep your camera off if you prefer."] },
+      { q: "I'm not in India. Can we still talk?", a: ["Yes. Tell me your time zone and I'll find a time that works for you."] },
+      {
+        q: "How do I book?",
+        a: [{
+          parts: [
+            "Send me a message on ",
+            { text: "WhatsApp", href: `https://wa.me/${WHATSAPP_NUMBER}` },
+            ", by ",
+            { text: "email", href: `mailto:${EMAIL_ADDRESS}` },
+            ", or through the ",
+            { text: "Write to Me form", to: "/consultation" },
+            ", and we'll choose a time together.",
+          ],
+        }],
+      },
+      { q: "Is the first session really free?", a: ["Yes, your first hour is on me. After that, sessions are $25 USD each."] },
+      { q: "How do I pay?", a: ["We'll go over payment options during our call, so you can choose what works best for you."] },
+      { q: "Can I reschedule or cancel?", a: ["Yes, just let me know 24 hours before."] },
+      { q: "Who are sessions for?", a: ["Sessions are for adults aged 18 and over."] },
+      { q: "What language are sessions in?", a: ["English only."] },
+    ],
+  },
+  {
+    heading: "Privacy and safety",
+    items: [
+      { q: "Is what I say kept private?", a: ["Yes. What you share stays private and is never shared with anyone, except where the law requires it or where someone's immediate safety is at serious risk."] },
+      { q: "What happens to my contact details?", a: ["Your messages and contact details are only used to arrange and hold our conversations. They're never sold, shared, or added to any mailing list, and you can ask for them to be deleted at any time."] },
+      { q: "What if I'm in crisis?", a: ["Please don't wait for a session. Contact your local emergency services or a crisis line right away (for example, 988 in the US)."] },
+    ],
+  },
+  {
+    heading: "The website",
+    items: [
+      { q: "Are the Brain Games and Mind Exercises free?", a: ["Yes. Everything on the site is free to use, with no sign-up."] },
+      { q: "Do I need an account?", a: ["No. There are no accounts, logins, cookies or tracking on this site."] },
+      { q: "Are my game scores or answers saved?", a: ["No. Nothing you type or play is stored or sent anywhere."] },
+      { q: "What do the Brain Games train?", a: ["Memory, attention and thinking: Chess for strategy, Recall and N Back for working memory, and Card, Word and Number Memory for recall."] },
+      { q: "What do the Mind Exercises do?", a: ["They train calm and focus: Mindfulness Breathing slows you down, Leetspeak Reading sharpens attention, Flow Type builds focus stamina, and Guilford's Test exercises creative thinking."] },
+      { q: "What is the RV Lab?", a: ["A space to practise remote viewing, an experimental exercise in perception. You sketch and describe a hidden target offline, then reveal the image. It's exploratory and experimental, not a scientifically proven method."] },
+      { q: "Who is the dog?", a: ["That's Diego, my pet! Tap him on any page for a tip."] },
+    ],
+  },
+];
+
+// Plain text of an answer, for the structured data.
+function faqAnswerText(blocks) {
+  return blocks
+    .map((b) => {
+      if (typeof b === "string") return b;
+      if (b.list) return b.list.map((item) => `- ${item}`).join("\n");
+      return b.parts.map((p) => (typeof p === "string" ? p : p.text)).join("");
+    })
+    .join("\n");
+}
+
+const FAQ_JSON_LD = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: FAQ_SECTIONS.flatMap((section) =>
+    section.items.map((item) => ({
+      "@type": "Question",
+      name: item.q,
+      acceptedAnswer: { "@type": "Answer", text: faqAnswerText(item.a) },
+    }))
+  ),
+}).replace(/</g, "\\u003c");
+
+const FAQ_CSS = `
+  .faq-q { list-style: none; cursor: pointer; }
+  .faq-q::-webkit-details-marker { display: none; }
+  .faq-q::marker { content: ""; }
+  .faq-q:focus { outline: none; }
+  .faq-q:focus-visible { outline: 2px solid ${COLORS.gold}; outline-offset: 3px; border-radius: 4px; }
+  .faq-icon::before { content: "+"; }
+  .faq-item[open] .faq-icon::before { content: "\\2212"; }
+  .faq-item[open] .faq-answer { animation: fadeIn 0.25s ease both; }
+`;
+
+function FaqAnswer({ blocks }) {
+  const c = useColors();
+  return blocks.map((b, i) => {
+    if (typeof b === "string") return <p key={i} style={styles(c).faqAnswerText}>{b}</p>;
+    if (b.list) {
+      return (
+        <ul key={i} style={styles(c).faqList}>
+          {b.list.map((item, j) => (<li key={j} style={styles(c).faqListItem}>{item}</li>))}
+        </ul>
+      );
+    }
+    return (
+      <p key={i} style={styles(c).faqAnswerText}>
+        {b.parts.map((p, j) => {
+          if (typeof p === "string") return <Fragment key={j}>{p}</Fragment>;
+          if (p.to) return <Link key={j} to={p.to} style={styles(c).faqLink}>{p.text}</Link>;
+          const external = p.href.startsWith("http");
+          return (
+            <a key={j} href={p.href} style={styles(c).faqLink} {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>{p.text}</a>
+          );
+        })}
+      </p>
+    );
+  });
+}
+
+function SiteFooterLine() {
+  const c = useColors();
+  return (
+    <p style={styles(c).homeFooterLine}>
+      <span>© {new Date().getFullYear()} Benjamin Mithra</span>{" "}
+      <span style={styles(c).homeFooterDot}>·</span>{" "}
+      <Link to={VIEW_PATH.privacy} className="home-footer-link" style={styles(c).homeFooterLink}>Privacy</Link>{" "}
+      <span style={styles(c).homeFooterDot}>·</span>{" "}
+      <Link to={VIEW_PATH.terms} className="home-footer-link" style={styles(c).homeFooterLink}>Terms</Link>{" "}
+      <span style={styles(c).homeFooterDot}>·</span>{" "}
+      <Link to={VIEW_PATH.disclaimer} className="home-footer-link" style={styles(c).homeFooterLink}>Disclaimer</Link>
+    </p>
+  );
+}
+
+function FaqScreen() {
+  const c = useColors();
+  return (
+    <div style={styles(c).faqWrap} className="fade-in">
+      <style>{FAQ_CSS}</style>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: FAQ_JSON_LD }} />
+      <h1 style={styles(c).faqHeading}>Frequently Asked Questions</h1>
+
+      {FAQ_SECTIONS.map((section) => (
+        <section key={section.heading} style={styles(c).faqSection}>
+          <h2 style={styles(c).placeholderSubhead}>{section.heading}</h2>
+          <div style={styles(c).faqItems}>
+            {section.items.map((item) => (
+              <details key={item.q} className="faq-item" style={styles(c).faqItem}>
+                <summary className="faq-q" style={styles(c).faqQuestion}>
+                  <span>{item.q}</span>
+                  <span className="faq-icon" style={styles(c).faqIcon} aria-hidden="true" />
+                </summary>
+                <div className="faq-answer" style={styles(c).faqAnswer}>
+                  <FaqAnswer blocks={item.a} />
+                </div>
+              </details>
+            ))}
+          </div>
+        </section>
+      ))}
+
+      <div style={styles(c).faqCta}>
+        <p style={styles(c).faqCtaText}>Still have a question?</p>
+        <Link to={VIEW_PATH.contact} style={styles(c).btnGold}>Get in touch</Link>
+      </div>
+
+      <SiteFooterLine />
+    </div>
+  );
+}
+
+// =================================================================
 // App
 // =================================================================
 function pickRandomGame(excludeSet) { const remaining = GAMES.filter((g) => !excludeSet.has(g.key)); return remaining[randInt(0, remaining.length - 1)].key; }
@@ -3840,6 +4041,7 @@ const TOP_TABS = [
   { key: "games", label: "Brain Games" },
   { key: "rvlab", label: "RV Lab" },
   { key: "contact", label: "Consultation" },
+  { key: "faq", label: "FAQ" },
 ];
 const HAMBURGER_MENU_ITEMS = [
   ...TOP_TABS,
@@ -3867,7 +4069,7 @@ const GAME_TABS = [
 // =================================================================
 const VIEW_PATH = {
   home: "/", journals: "/journals", exercises: "/exercises", games: "/games",
-  rvlab: "/rv-lab", contact: "/consultation", privacy: "/privacy", terms: "/terms", disclaimer: "/disclaimer",
+  rvlab: "/rv-lab", contact: "/consultation", faq: "/faq", privacy: "/privacy", terms: "/terms", disclaimer: "/disclaimer",
 };
 const GAME_SLUG = { chess: "chess", everyday: "recall", nback: "n-back", cards: "card-memory", words: "word-memory", numbers: "number-memory" };
 const GAME_KEY_FROM_SLUG = Object.fromEntries(Object.entries(GAME_SLUG).map(([k, v]) => [v, k]));
@@ -3896,6 +4098,7 @@ const PAGE_META = {
   contact: { title: "Private Consultation | Benjamin Mithra, Mind Interpreter", description: "A private one to one conversation with Benjamin Mithra, a Mind Interpreter. You talk, I listen, we explore: a space for conversation, reflection, and understanding." },
   privacy: { title: "Privacy Policy | Mind Interpreter", description: "How conversations and this site handle your information: conversations stay private, and the site uses no accounts, cookies, or tracking." },
   terms: { title: "Terms | Mind Interpreter", description: "Terms for using this site's games, exercises, and remote viewing content." },
+  faq: { title: "FAQ | Benjamin Mithra, Mind Interpreter", description: "Answers about private conversations with Benjamin Mithra, a Mind Interpreter: what you can talk about, how sessions work, privacy, and the site's Brain Games and Mind Exercises." },
   disclaimer: { title: "Disclaimer | Mind Interpreter", description: "Conversations here are not therapy or medical care, and the site's exercises and remote viewing content are educational and experimental." },
 };
 
@@ -3923,7 +4126,7 @@ export default function App() {
     const first = pathParts[0];
     if (first === "consultation") return "contact";
     if (first === "rv-lab") return "rvlab";
-    if (["journals", "exercises", "games", "privacy", "terms", "disclaimer"].includes(first)) return first;
+    if (["journals", "exercises", "games", "faq", "privacy", "terms", "disclaimer"].includes(first)) return first;
     return "home";
   }, [location.pathname]);
 
@@ -4087,6 +4290,7 @@ export default function App() {
           {view === "exercises" && exerciseTab === "guilford" && <GuilfordTestExercise />}
           {view === "rvlab" && <RVLabScreen />}
           {view === "contact" && <ContactScreen onNavigate={navigate} />}
+          {view === "faq" && <FaqScreen />}
           {view === "privacy" && (
             <PlaceholderScreen
               title="Privacy"
@@ -4452,6 +4656,23 @@ function styles(c) {
       fontFamily: font.body, fontSize: 15, lineHeight: 1.75, color: c.ink, margin: "6px 0 0",
       paddingLeft: 22, textAlign: "left", maxWidth: 480, listStyleType: "disc",
     },
+    faqWrap: { width: "100%", maxWidth: 600, display: "flex", flexDirection: "column", alignItems: "center", gap: 28, padding: "8px 0 20px" },
+    faqHeading: { fontFamily: font.display, fontWeight: 600, fontSize: 27, letterSpacing: "0.03em", lineHeight: 1.3, color: c.gold, margin: "2px 0 0", textAlign: "center", textWrap: "balance" },
+    faqSection: { width: "100%", textAlign: "left" },
+    faqItems: { borderBottom: `1px solid ${c.line}`, marginTop: 8 },
+    faqItem: { borderTop: `1px solid ${c.line}` },
+    faqQuestion: {
+      display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, padding: "14px 2px",
+      fontFamily: font.display, fontWeight: 500, fontSize: 16.5, letterSpacing: "0.02em", lineHeight: 1.45, color: c.gold,
+    },
+    faqIcon: { flexShrink: 0, width: 22, height: 22, borderRadius: "50%", border: `1px solid ${c.strongLine}`, color: c.gold, fontFamily: font.display, fontSize: 16, lineHeight: "20px", textAlign: "center" },
+    faqAnswer: { padding: "0 2px 16px", display: "flex", flexDirection: "column", gap: 10 },
+    faqAnswerText: { fontFamily: font.body, fontSize: 15.5, lineHeight: 1.7, color: c.muted, margin: 0 },
+    faqList: { fontFamily: font.body, fontSize: 15.5, lineHeight: 1.7, color: c.muted, margin: 0, paddingLeft: 22, listStyleType: "disc" },
+    faqListItem: { marginBottom: 4 },
+    faqLink: { color: c.gold, textDecoration: "none" },
+    faqCta: { display: "flex", flexDirection: "column", alignItems: "center", gap: 12, marginTop: 4 },
+    faqCtaText: { fontFamily: font.display, fontWeight: 500, fontSize: 18, letterSpacing: "0.02em", color: c.ink, margin: 0 },
     placeholderSection: { width: "100%", maxWidth: 480, textAlign: "left" },
     placeholderSubhead: { fontFamily: font.display, fontWeight: 500, fontSize: 14, letterSpacing: "0.08em", textTransform: "uppercase", color: c.gold, margin: "0 0 4px" },
     placeholderListItem: { fontFamily: font.body, fontSize: 15, lineHeight: 1.75, color: c.ink, marginBottom: 8 },
