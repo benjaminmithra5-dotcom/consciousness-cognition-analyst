@@ -799,7 +799,7 @@ function getContrastText(hex) {
   return luminance > 0.42 ? "#1B140D" : "#F3ECDD";
 }
 
-function WriteToMeForm({ style, id }) {
+function WriteToMeForm({ style, id, submitStyle }) {
   const c = useColors();
   const [wtmName, setWtmName] = useState("");
   const [wtmEmail, setWtmEmail] = useState("");
@@ -854,7 +854,7 @@ function WriteToMeForm({ style, id }) {
       {wtmStatus === "sent" && <p style={styles(c).writeToMeSuccess}>Message sent. Thank you, I'll get back to you soon.</p>}
       {wtmStatus === "failed" && <p style={styles(c).writeToMeError}>Something went wrong sending that. Please try again in a moment.</p>}
 
-      <button type="button" style={styles(c).btnPrimary} onClick={handleWtmSubmit} disabled={wtmStatus === "sending"}>
+      <button type="button" style={{ ...styles(c).btnPrimary, ...submitStyle }} onClick={handleWtmSubmit} disabled={wtmStatus === "sending"}>
         {wtmStatus === "sending" ? "Sending…" : "Submit"}
       </button>
     </div>
@@ -885,12 +885,14 @@ function HomeScreen({ onNavigate, onOpenExercise }) {
   return (
     <div style={styles(c).homeOuter}>
       <div style={styles(c).homeContent}>
-        <h1 style={styles(c).siteHeading}>
-          <img src="/logo.png" alt="Benjamin Mithra, Mind Interpreter logo" width="256" height="256" style={styles(c).siteLogo} />
-          <span style={styles(c).siteHeadingLine}>{SITE_HEADING}</span>
-        </h1>
-        <p style={styles(c).siteSubtitle}>Hi, I'm Benjamin Mithra</p>
-        <p style={styles(c).siteSubtitleLine}>Through listening and questions, I help untangle your thoughts and bring you real clarity.</p>
+        <div style={styles(c).homeHeader}>
+          <h1 style={styles(c).siteHeading}>
+            <img src="/logo.png" alt="Benjamin Mithra, Mind Interpreter logo" width="256" height="256" style={styles(c).siteLogo} />
+            <span style={styles(c).siteHeadingLine}>{SITE_HEADING}</span>
+          </h1>
+          <p style={styles(c).siteSubtitle}>Hi, I'm Benjamin Mithra</p>
+          <p style={styles(c).siteSubtitleLine}>Through listening and questions, I help untangle your thoughts and bring you real clarity.</p>
+        </div>
 
         <div style={styles(c).homeIntro}>
           <p style={styles(c).homeIntroText}>Private, judgment-free conversations about whatever is on your mind.</p>
@@ -901,8 +903,6 @@ function HomeScreen({ onNavigate, onOpenExercise }) {
           <p key={qIndex} className="fade-in" style={styles(c).homeQuestion}>{question}</p>
         </div>
 
-        <WriteToMeForm id="write-to-me" />
-
         <p style={styles(c).homePhilosophy}>
           This is a space to slow down and understand your own mind. Talk things through in a{" "}
           <Link to={VIEW_PATH.contact} style={styles(c).homeInlineLink}>private conversation</Link>, or explore on your own:{" "}
@@ -911,21 +911,24 @@ function HomeScreen({ onNavigate, onOpenExercise }) {
           <Link to={VIEW_PATH.rvlab} style={styles(c).homeInlineLink}>RV Lab</Link> for something more curious.
         </p>
 
-        <HomeAmbientBreathing onOpenExercise={onOpenExercise} />{" "}
-
-        <p style={styles(c).homeIntroText}>Decoding numbers as letters breaks your brain's autopilot reading, training attention and visual pattern recognition.</p>
-
-        <button type="button" style={styles(c).leetWrap} onClick={() => onOpenExercise("leet")} aria-label="Open Leetspeak Reading exercise">
-          <div style={styles(c).leetSweep} aria-hidden="true" />
-          <p style={styles(c).leetText}>{LEET_MESSAGE}</p>
-        </button>
-
         <div style={styles(c).heroButtonsGrid}>
           <Link to="/games/chess" className="nav-btn hero-btn" style={{ ...styles(c).heroBtn, ...styles(c).heroGridBtn }}>Play Chess</Link>{" "}
           <Link to="/exercises/guilfords-test" className="nav-btn hero-btn" style={{ ...styles(c).heroBtn, ...styles(c).heroGridBtn }}>Try Guilford's Test</Link>{" "}
           <Link to="/games/recall" className="nav-btn hero-btn" style={{ ...styles(c).heroBtn, ...styles(c).heroGridBtn }}>Practice Recall</Link>{" "}
           <Link to="/exercises/flow-type" className="nav-btn hero-btn" style={{ ...styles(c).heroBtn, ...styles(c).heroGridBtn }}>Try Flow Type</Link>
         </div>
+
+        <HomeAmbientBreathing onOpenExercise={onOpenExercise} />
+
+        <div style={styles(c).homeLeetGroup}>
+          <p style={styles(c).homeIntroText}>Decoding numbers as letters breaks your brain's autopilot reading, training attention and visual pattern recognition.</p>
+          <button type="button" style={styles(c).leetWrap} onClick={() => onOpenExercise("leet")} aria-label="Open Leetspeak Reading exercise">
+            <div style={styles(c).leetSweep} aria-hidden="true" />
+            <p style={styles(c).leetText}>{LEET_MESSAGE}</p>
+          </button>
+        </div>
+
+        <WriteToMeForm id="write-to-me" style={styles(c).homeWriteToMe} submitStyle={styles(c).btnGold} />
 
         <div style={styles(c).consultTeaserWrap}>
           <p style={styles(c).consultTeaserText}>Need Support?</p>
@@ -936,10 +939,10 @@ function HomeScreen({ onNavigate, onOpenExercise }) {
           <div className="emotion-marquee-track" style={styles(c).emotionMarqueeTrack}>
             {[0, 1].map((copy) => (
               <div key={copy} style={styles(c).emotionMarqueeCopy}>
-                {Object.entries(EMOTION_COLORS).map(([name, color], i) => (
+                {Object.keys(EMOTION_COLORS).map((name, i) => (
                   <Fragment key={name}>
                     {i > 0 && " "}
-                    <span style={{ ...styles(c).emotionBox, background: color, color: getContrastText(color) }}>
+                    <span style={styles(c).emotionBox}>
                       {name}
                     </span>
                   </Fragment>
@@ -949,7 +952,7 @@ function HomeScreen({ onNavigate, onOpenExercise }) {
           </div>
         </div>
 
-        <p style={styles(c).homeFooterLine}>
+        <p style={{ ...styles(c).homeFooterLine, margin: 0 }}>
           <span>© {new Date().getFullYear()} Benjamin Mithra</span>{" "}
           <span style={styles(c).homeFooterDot}>·</span>{" "}
           <Link to={VIEW_PATH.privacy} className="home-footer-link" style={styles(c).homeFooterLink}>Privacy</Link>{" "}
@@ -2276,6 +2279,8 @@ const BREATH_BALL_EXPANDED_SCALE = 1.85;
 const HOME_BREATH_BALL_REST = 46;
 
 const HOME_BREATH_LABELS = { in: "Inhale", hold1: "Hold", out: "Exhale", hold2: "Hold" };
+// Home uses gold tones instead of the exercise's phase colours.
+const HOME_BREATH_COLORS = { in: COLORS.gold, hold1: COLORS.goldDark, out: COLORS.gold, hold2: COLORS.goldDark };
 
 function HomeAmbientBreathing({ onOpenExercise }) {
   const c = useColors();
@@ -2312,7 +2317,7 @@ function HomeAmbientBreathing({ onOpenExercise }) {
 
   return (
     <button type="button" style={styles(c).homeBreathFrame} onClick={() => onOpenExercise("breathing")} aria-label="Open Mindfulness Breathing exercise">
-      <div style={{ ...styles(c).homeBreathBall, left: `${pos.x}%`, top: `${pos.y}%`, background: phase.color, transform: `translate(-50%, -50%) scale(${ballScale})`, transition: ballTransition }}>
+      <div style={{ ...styles(c).homeBreathBall, left: `${pos.x}%`, top: `${pos.y}%`, background: HOME_BREATH_COLORS[phase.key], transform: `translate(-50%, -50%) scale(${ballScale})`, transition: ballTransition }}>
         <span style={styles(c).homeBreathBallLabel}>{HOME_BREATH_LABELS[phase.key]}</span>
       </div>
     </button>
@@ -4456,22 +4461,25 @@ function styles(c) {
     mainHome: { padding: 0, maxWidth: "none", width: "100%" },
     mainChess: { paddingLeft: 4, paddingRight: 4 },
     homeOuter: { position: "relative", width: "100%", display: "flex", justifyContent: "center" },
-    homeContent: { position: "relative", zIndex: 1, width: "100%", maxWidth: 560, display: "flex", flexDirection: "column", alignItems: "center", gap: 18, padding: "36px 16px 60px", textAlign: "center" },
+    homeContent: { position: "relative", zIndex: 1, width: "100%", maxWidth: 560, display: "flex", flexDirection: "column", alignItems: "center", gap: 32, padding: "36px 16px 60px", textAlign: "center" },
+    homeHeader: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, width: "100%", maxWidth: 480 },
+    homeLeetGroup: { display: "flex", flexDirection: "column", alignItems: "center", gap: 14, width: "100%", maxWidth: 480 },
+    homeWriteToMe: { maxWidth: 480 },
     siteHeading: {
       fontFamily: font.display, fontWeight: 700, fontStyle: "normal",
       fontSize: "clamp(24px, 6vw, 32px)", letterSpacing: "0.09em", lineHeight: 1.45, textTransform: "uppercase",
-      color: c.gold, margin: "6px 0 0", textAlign: "center",
+      color: c.gold, margin: 0, textAlign: "center",
       display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: "clamp(10px, 3vw, 16px)",
       width: "100%", maxWidth: 720, padding: "0 16px", boxSizing: "border-box",
     },
     siteLogo: { width: "clamp(40px, 11vw, 60px)", height: "auto", flexShrink: 0, display: "block" },
     siteHeadingLine: { display: "block", whiteSpace: "nowrap" },
-    siteSubtitle: { fontFamily: font.body, fontSize: 19, lineHeight: 1.5, color: c.ink, margin: "-8px 0 0", textAlign: "center" },
-    siteSubtitleLine: { fontFamily: font.body, fontSize: 17, lineHeight: 1.55, color: c.ink, margin: "-10px 0 0", textAlign: "center", maxWidth: 480 },
-    homeIntro: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, width: "100%", maxWidth: 480, margin: "4px 0 0" },
+    siteSubtitle: { fontFamily: font.body, fontSize: 19, lineHeight: 1.5, color: c.ink, margin: 0, textAlign: "center" },
+    siteSubtitleLine: { fontFamily: font.body, fontSize: 17, lineHeight: 1.55, color: c.ink, margin: 0, textAlign: "center", maxWidth: 480 },
+    homeIntro: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, width: "100%", maxWidth: 480, margin: 0 },
     homeIntroText: { fontFamily: font.body, fontSize: 16, lineHeight: 1.6, color: c.muted, margin: 0, textAlign: "center" },
     homeIntroBtn: { width: "auto", display: "inline-block", marginTop: 6 },
-    heroButtonsGrid: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10, marginTop: 4, width: "100%", maxWidth: 380 },
+    heroButtonsGrid: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10, width: "100%", maxWidth: 480 },
     heroGridBtn: { display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1.3, padding: "9px 12px", boxSizing: "border-box", minWidth: 0 },
     heroBtn: {
       textDecoration: "none", textAlign: "center", fontFamily: font.display, fontWeight: 500, fontSize: 14, letterSpacing: "0.05em", textTransform: "uppercase",
@@ -4481,7 +4489,7 @@ function styles(c) {
     leetWrap: {
       position: "relative", width: "100%", maxWidth: 480, display: "flex", alignItems: "center", justifyContent: "center",
       overflow: "hidden", borderRadius: 12, padding: "24px 22px", border: "1px solid #29414B", background: "#081820",
-      cursor: "pointer", outline: "none", WebkitAppearance: "none", appearance: "none", textAlign: "left",
+      cursor: "pointer", outline: "none", WebkitAppearance: "none", appearance: "none", textAlign: "center",
     },
     leetSweep: {
       position: "absolute", inset: 0, zIndex: 1, pointerEvents: "none",
@@ -4491,21 +4499,22 @@ function styles(c) {
     },
     leetText: {
       position: "relative", zIndex: 2, fontFamily: font.mono, fontWeight: 400, fontSize: 16, lineHeight: 1.85,
-      letterSpacing: "0.02em", color: "#C8D0D0", margin: 0, textAlign: "left",
+      letterSpacing: "0.02em", color: "#C8D0D0", margin: 0, textAlign: "center",
     },
 
-    emotionMarqueeWrap: { width: "100%", overflow: "hidden", margin: "6px 0 0" },
+    emotionMarqueeWrap: { width: "100%", maxWidth: 480, overflow: "hidden", margin: 0 },
     emotionMarqueeTrack: { display: "flex", width: "max-content", animation: "marqueeScroll 90s linear infinite" },
     emotionMarqueeCopy: { display: "flex", flexShrink: 0, alignItems: "center", gap: 8, paddingRight: 40 },
     emotionBox: {
       fontFamily: font.mono, fontWeight: 700, fontSize: 12.5, letterSpacing: "0.03em", textTransform: "uppercase",
       padding: "8px 13px", borderRadius: 8, display: "inline-block", lineHeight: 1.2, whiteSpace: "nowrap", flexShrink: 0,
+      background: c.surface, border: `1px solid ${c.line}`, color: c.ink,
     },
 
     homeInlineLink: { color: c.gold, textDecoration: "none", fontStyle: "normal" },
     homePhilosophy: {
       fontFamily: font.body, fontStyle: "italic", fontWeight: 400, fontSize: 16.5, lineHeight: 1.9,
-      color: c.muted, maxWidth: 460, margin: "10px 0 0",
+      color: c.muted, width: "100%", maxWidth: 480, margin: 0,
     },
     homeFooterLine: {
       fontFamily: font.mono, fontSize: 12, color: c.muted, margin: "30px 0 0", padding: "18px 0 0",
@@ -4518,13 +4527,13 @@ function styles(c) {
       transition: "color 0.15s ease",
     },
     homeQuestionBox: {
-      background: "#F3ECDD", border: "2px solid #8E7CC3", borderRadius: 14, padding: "18px 26px",
+      background: c.surface, border: `1px solid ${c.gold}`, borderRadius: 14, padding: "18px 26px",
       width: "100%", maxWidth: 480, minHeight: 124, display: "flex", alignItems: "center", justifyContent: "center",
-      margin: "12px 0 4px", overflow: "hidden",
+      margin: 0, overflow: "hidden",
     },
     homeQuestion: {
       fontFamily: font.body, fontStyle: "italic", fontWeight: 700, fontSize: 18.5, lineHeight: 1.5,
-      letterSpacing: "0.01em", color: "#1B140D", margin: 0, textAlign: "center",
+      letterSpacing: "0.01em", color: c.gold, margin: 0, textAlign: "center",
     },
     topBar: { position: "relative", zIndex: 100, width: "100%", maxWidth: 680, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 20px" },
     cornerBtn: { textDecoration: "none", fontFamily: font.display, fontWeight: 500, fontSize: 14, letterSpacing: "0.06em", textTransform: "uppercase", background: "transparent", border: "1px solid #3A5661", borderRadius: 6, padding: "7px 15px", color: "#D6DDE0", cursor: "pointer", transition: "background 0.15s ease, border-color 0.15s ease, color 0.15s ease" },
@@ -4737,7 +4746,7 @@ function styles(c) {
       background: c.surface, border: `1px solid ${c.line}`, borderRadius: 12, padding: "22px 22px 24px", boxSizing: "border-box", textAlign: "left",
     },
     consultTeaserWrap: {
-      width: "100%", maxWidth: 460, display: "flex", flexDirection: "column", alignItems: "center", gap: 14,
+      width: "100%", maxWidth: 480, display: "flex", flexDirection: "column", alignItems: "center", gap: 14,
       background: c.surface, border: `1px solid ${c.line}`, borderRadius: 12, padding: "22px 22px 24px", boxSizing: "border-box", textAlign: "center",
     },
     consultTeaserText: { fontFamily: font.display, fontWeight: 500, fontSize: 16, color: c.ink, margin: 0 },
