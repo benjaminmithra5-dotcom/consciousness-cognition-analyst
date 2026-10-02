@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo, createContext, useContext } from "react";
+import { Fragment, useState, useEffect, useRef, useMemo, createContext, useContext } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import * as Tone from "tone";
 
@@ -906,7 +906,7 @@ function HomeScreen({ onNavigate, onOpenExercise }) {
 
         <p style={styles(c).homePhilosophy}>{PHILOSOPHY_TEXT}</p>
 
-        <HomeAmbientBreathing onOpenExercise={onOpenExercise} />
+        <HomeAmbientBreathing onOpenExercise={onOpenExercise} />{" "}
 
         <button type="button" style={styles(c).leetWrap} onClick={() => onOpenExercise("leet")} aria-label="Open Leetspeak Reading exercise">
           <div style={styles(c).leetSweep} aria-hidden="true" />
@@ -914,9 +914,9 @@ function HomeScreen({ onNavigate, onOpenExercise }) {
         </button>
 
         <div style={styles(c).heroButtonsGrid}>
-          <Link to={VIEW_PATH.journals} className="nav-btn hero-btn" style={styles(c).heroBtn}>Read</Link>
-          <Link to={VIEW_PATH.exercises} className="nav-btn hero-btn" style={styles(c).heroBtn}>Exercise</Link>
-          <Link to={VIEW_PATH.games} className="nav-btn hero-btn" style={styles(c).heroBtn}>Play</Link>
+          <Link to={VIEW_PATH.journals} className="nav-btn hero-btn" style={styles(c).heroBtn}>Read</Link>{" "}
+          <Link to={VIEW_PATH.exercises} className="nav-btn hero-btn" style={styles(c).heroBtn}>Exercise</Link>{" "}
+          <Link to={VIEW_PATH.games} className="nav-btn hero-btn" style={styles(c).heroBtn}>Play</Link>{" "}
           <Link to={VIEW_PATH.rvlab} className="nav-btn hero-btn" style={styles(c).heroBtn}>View</Link>
         </div>
 
@@ -929,10 +929,13 @@ function HomeScreen({ onNavigate, onOpenExercise }) {
           <div className="emotion-marquee-track" style={styles(c).emotionMarqueeTrack}>
             {[0, 1].map((copy) => (
               <div key={copy} style={styles(c).emotionMarqueeCopy}>
-                {Object.entries(EMOTION_COLORS).map(([name, color]) => (
-                  <span key={name} style={{ ...styles(c).emotionBox, background: color, color: getContrastText(color) }}>
-                    {name}
-                  </span>
+                {Object.entries(EMOTION_COLORS).map(([name, color], i) => (
+                  <Fragment key={name}>
+                    {i > 0 && " "}
+                    <span style={{ ...styles(c).emotionBox, background: color, color: getContrastText(color) }}>
+                      {name}
+                    </span>
+                  </Fragment>
                 ))}
               </div>
             ))}
@@ -940,12 +943,12 @@ function HomeScreen({ onNavigate, onOpenExercise }) {
         </div>
 
         <p style={styles(c).homeFooterLine}>
-          <span>© {new Date().getFullYear()} Benjamin Mithra</span>
-          <span style={styles(c).homeFooterDot}>·</span>
-          <Link to={VIEW_PATH.privacy} className="home-footer-link" style={styles(c).homeFooterLink}>Privacy</Link>
-          <span style={styles(c).homeFooterDot}>·</span>
-          <Link to={VIEW_PATH.terms} className="home-footer-link" style={styles(c).homeFooterLink}>Terms</Link>
-          <span style={styles(c).homeFooterDot}>·</span>
+          <span>© {new Date().getFullYear()} Benjamin Mithra</span>{" "}
+          <span style={styles(c).homeFooterDot}>·</span>{" "}
+          <Link to={VIEW_PATH.privacy} className="home-footer-link" style={styles(c).homeFooterLink}>Privacy</Link>{" "}
+          <span style={styles(c).homeFooterDot}>·</span>{" "}
+          <Link to={VIEW_PATH.terms} className="home-footer-link" style={styles(c).homeFooterLink}>Terms</Link>{" "}
+          <span style={styles(c).homeFooterDot}>·</span>{" "}
           <Link to={VIEW_PATH.disclaimer} className="home-footer-link" style={styles(c).homeFooterLink}>Disclaimer</Link>
         </p>
       </div>
@@ -2798,12 +2801,12 @@ function PlaceholderScreen({ title, note, points, onNavigate }) {
 
       {onNavigate && (
         <p style={styles(c).homeFooterLine}>
-          <span>© {new Date().getFullYear()} Benjamin Mithra</span>
-          <span style={styles(c).homeFooterDot}>·</span>
-          <Link to={VIEW_PATH.privacy} className="home-footer-link" style={styles(c).homeFooterLink}>Privacy</Link>
-          <span style={styles(c).homeFooterDot}>·</span>
-          <Link to={VIEW_PATH.terms} className="home-footer-link" style={styles(c).homeFooterLink}>Terms</Link>
-          <span style={styles(c).homeFooterDot}>·</span>
+          <span>© {new Date().getFullYear()} Benjamin Mithra</span>{" "}
+          <span style={styles(c).homeFooterDot}>·</span>{" "}
+          <Link to={VIEW_PATH.privacy} className="home-footer-link" style={styles(c).homeFooterLink}>Privacy</Link>{" "}
+          <span style={styles(c).homeFooterDot}>·</span>{" "}
+          <Link to={VIEW_PATH.terms} className="home-footer-link" style={styles(c).homeFooterLink}>Terms</Link>{" "}
+          <span style={styles(c).homeFooterDot}>·</span>{" "}
           <Link to={VIEW_PATH.disclaimer} className="home-footer-link" style={styles(c).homeFooterLink}>Disclaimer</Link>
         </p>
       )}
@@ -3180,7 +3183,10 @@ function ContactScreen({ onNavigate }) {
           <img src="/benjamin-mithra.jpg" alt="Benjamin Mithra" width="360" height="360" style={styles(c).contactPortrait} />
           <div style={styles(c).contactBubbleStack}>
             {CONTACT_INTRO_BUBBLES.map((b, i) => (
-              <span key={i} style={{ ...styles(c).contactBubble, animationDelay: `${(i * 0.4).toFixed(2)}s` }}>{b}</span>
+              <Fragment key={i}>
+                {i > 0 && " "}
+                <span style={{ ...styles(c).contactBubble, animationDelay: `${(i * 0.4).toFixed(2)}s` }}>{b}</span>
+              </Fragment>
             ))}
           </div>
         </div>
@@ -3217,7 +3223,7 @@ function ContactScreen({ onNavigate }) {
         <div style={styles(c).contactIconsRow}>
           <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer" style={styles(c).contactIconLink} aria-label="Message on WhatsApp">
             <WhatsAppIcon /><span>WhatsApp</span>
-          </a>
+          </a>{" "}
           <a href={`mailto:${EMAIL_ADDRESS}`} style={styles(c).contactIconLink} aria-label="Send an email">
             <EmailIcon /><span>Email</span>
           </a>
@@ -3227,12 +3233,12 @@ function ContactScreen({ onNavigate }) {
       </div>
 
       <p style={styles(c).homeFooterLine}>
-        <span>© {new Date().getFullYear()} Benjamin Mithra</span>
-        <span style={styles(c).homeFooterDot}>·</span>
-        <Link to={VIEW_PATH.privacy} className="home-footer-link" style={styles(c).homeFooterLink}>Privacy</Link>
-        <span style={styles(c).homeFooterDot}>·</span>
-        <Link to={VIEW_PATH.terms} className="home-footer-link" style={styles(c).homeFooterLink}>Terms</Link>
-        <span style={styles(c).homeFooterDot}>·</span>
+        <span>© {new Date().getFullYear()} Benjamin Mithra</span>{" "}
+        <span style={styles(c).homeFooterDot}>·</span>{" "}
+        <Link to={VIEW_PATH.privacy} className="home-footer-link" style={styles(c).homeFooterLink}>Privacy</Link>{" "}
+        <span style={styles(c).homeFooterDot}>·</span>{" "}
+        <Link to={VIEW_PATH.terms} className="home-footer-link" style={styles(c).homeFooterLink}>Terms</Link>{" "}
+        <span style={styles(c).homeFooterDot}>·</span>{" "}
         <Link to={VIEW_PATH.disclaimer} className="home-footer-link" style={styles(c).homeFooterLink}>Disclaimer</Link>
       </p>
     </div>
@@ -3945,10 +3951,13 @@ export default function App() {
         {view === "home" || view === "contact" ? (
           <div style={styles(c).topBar}>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center", width: "100%" }}>
-              {TOP_TABS.map((t) => (
-                <Link key={t.key} to={VIEW_PATH[t.key] || "/"} className="nav-btn" style={{ ...styles(c).cornerBtn, ...(view === t.key ? styles(c).cornerBtnActive : {}) }}>
-                  {t.label}
-                </Link>
+              {TOP_TABS.map((t, i) => (
+                <Fragment key={t.key}>
+                  {i > 0 && " "}
+                  <Link to={VIEW_PATH[t.key] || "/"} className="nav-btn" style={{ ...styles(c).cornerBtn, ...(view === t.key ? styles(c).cornerBtnActive : {}) }}>
+                    {t.label}
+                  </Link>
+                </Fragment>
               ))}
             </div>
           </div>
