@@ -892,6 +892,12 @@ function HomeScreen({ onNavigate, onOpenExercise }) {
         </h1>
         <p style={styles(c).siteSubtitle}>Hi, I'm Benjamin Mithra</p>
 
+        <div style={styles(c).homeIntro}>
+          <p style={styles(c).homeIntroTagline}>You talk. I listen. We explore.</p>
+          <p style={styles(c).homeIntroText}>A private, one-to-one conversation about whatever is on your mind, with no judgment, no unasked-for advice, and nothing you need to prepare.</p>
+          <Link to={VIEW_PATH.contact} className="nav-btn hero-btn" style={{ ...styles(c).heroBtn, ...styles(c).homeIntroBtn }}>How it works</Link>
+        </div>
+
         <div style={styles(c).homeQuestionBox}>
           <p key={qIndex} className="fade-in" style={styles(c).homeQuestion}>{question}</p>
         </div>
@@ -3776,7 +3782,7 @@ const EXERCISE_KEY_FROM_SLUG = Object.fromEntries(Object.entries(EXERCISE_SLUG).
 // change (including on the very first load, which is what the
 // prerender step below captures into the static HTML for that URL).
 const PAGE_META = {
-  home: { title: "Mind Interpreter | Benjamin Mithra", description: "Cognitive performance consultation, mindfulness exercises, memory games, and remote viewing practice with Benjamin Mithra, a Mind Interpreter." },
+  home: { title: "Mind Interpreter | Benjamin Mithra", description: "Private one-to-one conversations with Benjamin Mithra, a Mind Interpreter. You talk, I listen, we explore: a space to be heard without judgment." },
   journals: { title: "Journals | Mind Interpreter", description: "Reflections and reading on consciousness, cognition, and mindfulness from Benjamin Mithra. New journal entries coming soon." },
   exercises: { title: "Mindfulness and Cognitive Exercises | Mind Interpreter", description: "Guided mindfulness breathing, leetspeak reading, flow typing, and Guilford's divergent thinking test to train focus, calm, and cognitive fluency." },
   "exercise-breathing": { title: "Mindfulness Breathing Exercise | Mind Interpreter", description: "A guided breathing exercise: inhale, hold, exhale, and hold again, paced to help you slow down and breathe more deliberately." },
@@ -4113,6 +4119,10 @@ function styles(c) {
     siteLogo: { width: "clamp(40px, 11vw, 60px)", height: "auto", flexShrink: 0, display: "block" },
     siteHeadingLine: { display: "block", whiteSpace: "nowrap" },
     siteSubtitle: { fontFamily: font.body, fontSize: 19, lineHeight: 1.5, color: c.ink, margin: "-8px 0 0", textAlign: "center" },
+    homeIntro: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10, width: "100%", maxWidth: 480, margin: "4px 0 0" },
+    homeIntroTagline: { fontFamily: font.display, fontWeight: 500, fontSize: 21, letterSpacing: "0.04em", lineHeight: 1.35, color: c.gold, margin: 0, textAlign: "center" },
+    homeIntroText: { fontFamily: font.body, fontSize: 16, lineHeight: 1.6, color: c.muted, margin: 0, textAlign: "center" },
+    homeIntroBtn: { width: "auto", display: "inline-block", marginTop: 6 },
     heroButtonsGrid: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10, marginTop: 4, width: "100%", maxWidth: 300 },
     heroBtn: {
       fontFamily: font.display, fontWeight: 500, fontSize: 14, letterSpacing: "0.05em", textTransform: "uppercase",
