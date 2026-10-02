@@ -882,6 +882,14 @@ function HomeScreen({ onNavigate, onOpenExercise }) {
 
   const question = orderRef.current[qIndex];
 
+  const scrollToWriteToMe = (e) => {
+    const el = document.getElementById("write-to-me");
+    if (!el) return;
+    e.preventDefault();
+    const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+  };
+
   return (
     <div style={styles(c).homeOuter}>
       <div style={styles(c).homeContent}>
@@ -902,6 +910,8 @@ function HomeScreen({ onNavigate, onOpenExercise }) {
         <div style={styles(c).homeQuestionBox}>
           <p key={qIndex} className="fade-in" style={styles(c).homeQuestion}>{question}</p>
         </div>
+
+        <a href="#write-to-me" onClick={scrollToWriteToMe} className="nav-btn hero-btn" style={{ ...styles(c).heroBtn, ...styles(c).homeIntroBtn, marginTop: 0 }}>Write to Me</a>
 
         <p style={styles(c).homePhilosophy}>
           This is a space to slow down and understand your own mind. Talk things through in a{" "}
@@ -3691,6 +3701,61 @@ function PawIcon() {
 
 const gdScale = () => (window.innerWidth <= 600 ? 0.8 : 1);
 
+// =================================================================
+// Floating WhatsApp button (bottom right). Like Diego, it only appears
+// in a real browser after load, so it stays out of the prerendered HTML.
+// Diego's spacer at the end of every page keeps the last content clear.
+// =================================================================
+const WHATSAPP_FLOAT_MESSAGE = "Hi Benjamin, I found your website and I'd like to talk.";
+
+const WHATSAPP_FLOAT_CSS = `
+  .wa-float {
+    position: fixed; right: 20px; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); z-index: 30;
+    width: 56px; height: 56px; border-radius: 50%; background: #25D366; color: #FFFFFF;
+    display: flex; align-items: center; justify-content: center; text-decoration: none;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.35); transition: transform 0.2s ease, box-shadow 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .wa-float svg { width: 30px; height: 30px; }
+  .wa-float:hover, .wa-float:active { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(0,0,0,0.4); }
+  .wa-float:focus { outline: none; }
+  .wa-float:focus-visible { outline: 2px solid ${COLORS.gold}; outline-offset: 3px; }
+  @media (max-width: 600px) {
+    .wa-float { width: 52px; height: 52px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
+    .wa-float svg { width: 28px; height: 28px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wa-float { transition: none; }
+    .wa-float:hover, .wa-float:active { transform: none; }
+  }
+`;
+
+function WhatsAppFloat() {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    if (navigator.webdriver) return;
+    const show = () => setReady(true);
+    if (document.readyState === "complete") { show(); return; }
+    window.addEventListener("load", show);
+    return () => window.removeEventListener("load", show);
+  }, []);
+  if (!ready) return null;
+  return (
+    <>
+      <style>{WHATSAPP_FLOAT_CSS}</style>
+      <a
+        className="wa-float"
+        href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_FLOAT_MESSAGE)}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Chat with Benjamin on WhatsApp"
+      >
+        <WhatsAppIcon />
+      </a>
+    </>
+  );
+}
+
 function GuideDog({ view }) {
   const location = useLocation();
   const [ready, setReady] = useState(false);
@@ -4255,13 +4320,23 @@ export default function App() {
           .hero-btn:hover { background: #F0BD4D !important; border-color: #F0BD4D !important; color: #111820 !important; }
           .home-footer-link:hover { color: #E2AA3B !important; }
           .nav-btn:hover .exercise-card-title, .nav-btn:hover .exercise-card-desc { color: #FFFFFF !important; }
+          @media (max-width: 600px) {
+            .top-tabs { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: 6px !important; }
+            .top-tabs .nav-btn {
+              display: flex; align-items: center; justify-content: center; text-align: center; min-width: 0;
+              font-size: 12px !important; letter-spacing: 0.04em !important; line-height: 1.2; padding: 8px 4px !important; min-height: 40px;
+            }
+          }
+          @media (max-width: 360px) {
+            .top-tabs .nav-btn { font-size: 11px !important; letter-spacing: 0.02em !important; padding: 8px 2px !important; }
+          }
         `}</style>
 
         <CosmicBackground />
 
         {view === "home" || view === "contact" ? (
           <div style={styles(c).topBar}>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center", width: "100%" }}>
+            <div className="top-tabs" style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center", width: "100%" }}>
               {TOP_TABS.map((t, i) => (
                 <Fragment key={t.key}>
                   {i > 0 && " "}
@@ -4437,6 +4512,7 @@ export default function App() {
         </main>
 
         <GuideDog view={view} />
+        {(view === "home" || view === "contact" || view === "faq" || (view === "exercises" && !exerciseTab) || (view === "games" && !gameTab)) && <WhatsAppFloat />}
       </div>
     </ThemeContext.Provider>
   );
